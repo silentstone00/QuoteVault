@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HomeView: View {
     @StateObject private var viewModel = QuoteListViewModel()
+    @EnvironmentObject var themeManager: ThemeManager
     
     var body: some View {
         NavigationView {
@@ -22,6 +23,7 @@ struct HomeView: View {
                         // Quote of the Day Card
                         if let qotd = viewModel.quoteOfTheDay {
                             QuoteOfTheDayCard(quote: qotd)
+                                .environmentObject(themeManager)
                                 .padding(.horizontal)
                                 .padding(.top, 8)
                         }
@@ -57,6 +59,7 @@ struct HomeView: View {
                             LazyVStack(spacing: 12) {
                                 ForEach(viewModel.quotes) { quote in
                                     QuoteCardView(quote: quote)
+                                    .environmentObject(themeManager)
                                         .padding(.horizontal)
                                         .onAppear {
                                             // Infinite scroll trigger

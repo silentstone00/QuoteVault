@@ -128,9 +128,9 @@ class CollectionManager: CollectionManagerProtocol {
             throw CollectionError.emptyCollectionName
         }
         
-        guard let userId = authService.currentUser.value?.id else {
-            throw CollectionError.notAuthenticated
-        }
+        // Get current user
+        let session = try await supabase.auth.session
+        let userId = session.user.id
         
         // Create in database
         let newCollection = QuoteCollection(
@@ -141,7 +141,7 @@ class CollectionManager: CollectionManagerProtocol {
             quoteCount: 0
         )
         
-        let response: [QuoteCollection] = try await supabase.database
+        let response: [QuoteCollection] = try await supabase
             .from("collections")
             .insert(newCollection)
             .select()
@@ -165,7 +165,7 @@ class CollectionManager: CollectionManagerProtocol {
     
     func deleteCollection(id: UUID) async throws {
         // Delete from database (cascade will remove collection_quotes)
-        try await supabase.database
+        try await supabase
             .from("collections")
             .delete()
             .eq("id", value: id.uuidString)
@@ -188,14 +188,14 @@ class CollectionManager: CollectionManagerProtocol {
             addedAt: Date()
         )
         
-        try await supabase.database
+        try await supabase
             .from("collection_quotes")
             .insert(collectionQuote)
             .execute()
     }
     
     func removeFromCollection(quoteId: UUID, collectionId: UUID) async throws {
-        try await supabase.database
+        try await supabase
             .from("collection_quotes")
             .delete()
             .eq("collection_id", value: collectionId.uuidString)
@@ -205,7 +205,7 @@ class CollectionManager: CollectionManagerProtocol {
     
     func getQuotesInCollection(collectionId: UUID) async throws -> [Quote] {
         // Query collection_quotes joined with quotes
-        let response: [CollectionQuoteWithQuote] = try await supabase.database
+        let response: [CollectionQuoteWithQuote] = try await supabase
             .from("collection_quotes")
             .select("*, quotes(*)")
             .eq("collection_id", value: collectionId.uuidString)
@@ -216,12 +216,14 @@ class CollectionManager: CollectionManagerProtocol {
     }
     
     func syncFromCloud() async throws {
-        guard let userId = authService.currentUser.value?.id else {
+        // Get current user
+        guard let session = try? await supabase.auth.session else {
             return
         }
+        let userId = session.user.id
         
         // Sync favorites
-        let favoriteRecords: [UserFavorite] = try await supabase.database
+        let favoriteRecords: [UserFavorite] = try await supabase
             .from("user_favorites")
             .select()
             .eq("user_id", value: userId.uuidString)
@@ -232,7 +234,7 @@ class CollectionManager: CollectionManagerProtocol {
         
         // Fetch favorite quotes
         if !favoriteQuoteIds.isEmpty {
-            let favoriteQuotes: [Quote] = try await supabase.database
+            let favoriteQuotes: [Quote] = try await supabase
                 .from("quotes")
                 .select()
                 .in("id", values: favoriteQuoteIds.map { $0.uuidString })
@@ -245,7 +247,7 @@ class CollectionManager: CollectionManagerProtocol {
         }
         
         // Sync collections
-        let userCollections: [QuoteCollection] = try await supabase.database
+        let userCollections: [QuoteCollection] = try await supabase
             .from("collections")
             .select()
             .eq("user_id", value: userId.uuidString)
@@ -259,7 +261,8 @@ class CollectionManager: CollectionManagerProtocol {
     // MARK: - Private Methods
     
     private func favorite(quote: Quote) async throws {
-        guard let userId = authService.currentUser.value?.id else {
+        // Try to get current user
+        guard let session = try? await supabase.auth.session else {
             // Save locally for offline
             var current = favoritesSubject.value
             current.append(quote)
@@ -268,6 +271,7 @@ class CollectionManager: CollectionManagerProtocol {
             localStorage.saveFavorites(current)
             return
         }
+        let userId = session.user.id
         
         // Save to database
         let favorite = UserFavorite(
@@ -277,7 +281,7 @@ class CollectionManager: CollectionManagerProtocol {
             createdAt: Date()
         )
         
-        try await supabase.database
+        try await supabase
             .from("user_favorites")
             .insert(favorite)
             .execute()
@@ -291,7 +295,8 @@ class CollectionManager: CollectionManagerProtocol {
     }
     
     private func unfavorite(quote: Quote) async throws {
-        guard let userId = authService.currentUser.value?.id else {
+        // Try to get current user
+        guard let session = try? await supabase.auth.session else {
             // Remove locally
             var current = favoritesSubject.value
             current.removeAll { $0.id == quote.id }
@@ -300,9 +305,10 @@ class CollectionManager: CollectionManagerProtocol {
             localStorage.saveFavorites(current)
             return
         }
+        let userId = session.user.id
         
         // Delete from database
-        try await supabase.database
+        try await supabase
             .from("user_favorites")
             .delete()
             .eq("user_id", value: userId.uuidString)

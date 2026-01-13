@@ -10,6 +10,7 @@ import SwiftUI
 struct CollectionDetailView: View {
     let collection: QuoteCollection
     @StateObject private var viewModel = CollectionViewModel()
+    @EnvironmentObject var themeManager: ThemeManager
     @State private var showDeleteAlert = false
     @Environment(\.dismiss) private var dismiss
     
@@ -41,6 +42,7 @@ struct CollectionDetailView: View {
                                     }
                                 }
                             )
+                            .environmentObject(themeManager)
                             .padding(.horizontal)
                         }
                     }
@@ -96,12 +98,13 @@ struct CollectionDetailView: View {
 struct CollectionQuoteCard: View {
     let quote: Quote
     let onRemove: () -> Void
+    @EnvironmentObject var themeManager: ThemeManager
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             // Quote Text
             Text(quote.text)
-                .font(.body)
+                .font(.system(size: themeManager.quoteFontSize))
                 .foregroundColor(.primary)
             
             // Author and Category

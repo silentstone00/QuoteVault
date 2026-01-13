@@ -191,6 +191,24 @@ class AuthViewModel: ObservableObject {
         isLoading = false
     }
     
+    /// Update user profile
+    func updateProfile(name: String?, avatarData: Data?) async {
+        isLoading = true
+        errorMessage = nil
+        
+        do {
+            try await authService.updateProfile(name: name, avatarData: avatarData)
+            // Refresh current user
+            if let user = try await authService.restoreSession() {
+                currentUser = user
+            }
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        
+        isLoading = false
+    }
+    
     /// Clear error message
     func clearError() {
         errorMessage = nil

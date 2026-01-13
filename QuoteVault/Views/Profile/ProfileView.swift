@@ -54,7 +54,7 @@ struct ProfileView: View {
                                 .onChange(of: selectedPhoto) { newValue in
                                     Task {
                                         if let data = try? await newValue?.loadTransferable(type: Data.self) {
-                                            try? await viewModel.authService.updateProfile(name: nil, avatarData: data)
+                                            await viewModel.updateProfile(name: nil, avatarData: data)
                                         }
                                     }
                                 }
@@ -98,7 +98,7 @@ struct ProfileView: View {
                                     
                                     Button("Save") {
                                         Task {
-                                            try? await viewModel.authService.updateProfile(
+                                            await viewModel.updateProfile(
                                                 name: editedName,
                                                 avatarData: nil
                                             )

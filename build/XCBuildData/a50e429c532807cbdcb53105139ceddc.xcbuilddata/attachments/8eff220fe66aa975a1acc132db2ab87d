@@ -1,0 +1,4 @@
+module SwiftCheck {
+header "SwiftCheck-Swift.h"
+export *
+}

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MainTabView: View {
     @StateObject private var authViewModel = AuthViewModel()
+    @EnvironmentObject var themeManager: ThemeManager
     
     var body: some View {
         TabView {
@@ -35,8 +36,14 @@ struct MainTabView: View {
                 .tabItem {
                     Label("Profile", systemImage: "person.fill")
                 }
+            
+            // Settings Tab
+            SettingsView()
+                .tabItem {
+                    Label("Settings", systemImage: "gear")
+                }
         }
-        .accentColor(.blue)
+        .accentColor(themeManager.accentColor)
     }
 }
 

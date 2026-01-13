@@ -10,6 +10,7 @@ import SwiftUI
 @main
 struct QuoteVaultApp: App {
     @StateObject private var authViewModel = AuthViewModel()
+    @StateObject private var themeManager = ThemeManager()
     
     init() {
         // Configure app appearance
@@ -23,12 +24,16 @@ struct QuoteVaultApp: App {
                     // Show main app
                     MainTabView()
                         .environmentObject(authViewModel)
+                        .environmentObject(themeManager)
                 } else {
                     // Show login
                     LoginView()
                         .environmentObject(authViewModel)
+                        .environmentObject(themeManager)
                 }
             }
+            .preferredColorScheme(themeManager.colorScheme)
+            .accentColor(themeManager.accentColor)
             .onAppear {
                 // Restore session on app launch
                 Task {

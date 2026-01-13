@@ -16,7 +16,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		68CCA9DE2F15705200216970 /* QuoteVault.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = QuoteVault.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		68CCA9DE2F15705200216970 /* QuoteVault.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = QuoteVault.app; path = "/Users/silentstone/Documents/xcode/QuoteVault/build/Debug-iphoneos/QuoteVault.app"; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -61,16 +61,7 @@
 			isa = PBXGroup;
 			children = (
 				68CCA9E02F15705200216970 /* QuoteVault */,
-				68CCA9DF2F15705200216970 /* Products */,
 			);
-			sourceTree = "<group>";
-		};
-		68CCA9DF2F15705200216970 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				68CCA9DE2F15705200216970 /* QuoteVault.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -133,7 +124,7 @@
 				68CCAA012F1635F900216970 /* XCRemoteSwiftPackageReference "SwiftCheck" */,
 			);
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 68CCA9DF2F15705200216970 /* Products */;
+			productRefGroup = 68CCA9D52F15705200216970;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (

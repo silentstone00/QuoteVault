@@ -9,6 +9,7 @@ import SwiftUI
 
 struct CollectionsListView: View {
     @StateObject private var viewModel = CollectionViewModel()
+    @EnvironmentObject var themeManager: ThemeManager
     
     var body: some View {
         NavigationView {
@@ -26,7 +27,8 @@ struct CollectionsListView: View {
                     ScrollView {
                         LazyVStack(spacing: 12) {
                             ForEach(viewModel.collections) { collection in
-                                NavigationLink(destination: CollectionDetailView(collection: collection)) {
+                                NavigationLink(destination: CollectionDetailView(collection: collection)
+                                    .environmentObject(themeManager)) {
                                     CollectionCard(collection: collection)
                                 }
                                 .buttonStyle(PlainButtonStyle())

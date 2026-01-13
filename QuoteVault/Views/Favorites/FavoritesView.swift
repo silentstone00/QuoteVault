@@ -9,6 +9,7 @@ import SwiftUI
 
 struct FavoritesView: View {
     @StateObject private var viewModel = CollectionViewModel()
+    @EnvironmentObject var themeManager: ThemeManager
     
     var body: some View {
         NavigationView {
@@ -37,6 +38,7 @@ struct FavoritesView: View {
                                         viewModel.showAddToCollectionSheet(for: quote)
                                     }
                                 )
+                                .environmentObject(themeManager)
                                 .padding(.horizontal)
                             }
                         }
@@ -82,12 +84,13 @@ struct FavoriteQuoteCard: View {
     let quote: Quote
     let onUnfavorite: () -> Void
     let onAddToCollection: () -> Void
+    @EnvironmentObject var themeManager: ThemeManager
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             // Quote Text
             Text(quote.text)
-                .font(.body)
+                .font(.system(size: themeManager.quoteFontSize))
                 .foregroundColor(.primary)
             
             // Author and Category

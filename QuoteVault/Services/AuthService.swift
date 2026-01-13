@@ -141,32 +141,35 @@ class AuthService: AuthServiceProtocol {
         // Upload avatar if provided
         if let avatarData = avatarData {
             let fileName = "\(userId.uuidString).jpg"
-            let path = "avatars/\(fileName)"
+            let avatarPath = "avatars/\(fileName)"
             
             try await supabase.storage
                 .from("avatars")
-                .upload(path: path, file: avatarData, options: .init(upsert: true))
+                .upload(avatarPath, data: avatarData, options: .init(upsert: true))
             
             // Get public URL
             avatarUrl = try supabase.storage
                 .from("avatars")
-                .getPublicURL(path: path)
+                .getPublicURL(path: avatarPath)
                 .absoluteString
         }
         
         // Update profile in database
-        var updates: [String: Any] = [:]
-        if let name = name {
-            updates["display_name"] = name
+        struct ProfileUpdate: Encodable {
+            let display_name: String?
+            let avatar_url: String?
+            let updated_at: String
         }
-        if let avatarUrl = avatarUrl {
-            updates["avatar_url"] = avatarUrl
-        }
-        updates["updated_at"] = ISO8601DateFormatter().string(from: Date())
         
-        try await supabase.database
+        let update = ProfileUpdate(
+            display_name: name,
+            avatar_url: avatarUrl,
+            updated_at: ISO8601DateFormatter().string(from: Date())
+        )
+        
+        try await supabase
             .from("profiles")
-            .update(updates)
+            .update(update)
             .eq("id", value: userId.uuidString)
             .execute()
         
@@ -194,10 +197,11 @@ class AuthService: AuthServiceProtocol {
     
     private func setupAuthStateListener() async {
         // Listen for auth state changes
-        for await state in supabase.auth.authStateChanges {
-            switch state {
-            case .signedIn(let session):
-                if let user = try? await fetchUserProfile(userId: session.user.id) {
+        for await (event, session) in supabase.auth.authStateChanges {
+            switch event {
+            case .signedIn:
+                if let session = session,
+                   let user = try? await fetchUserProfile(userId: session.user.id) {
                     userSubject.send(user)
                 }
             case .signedOut:
@@ -209,7 +213,7 @@ class AuthService: AuthServiceProtocol {
     }
     
     private func fetchUserProfile(userId: UUID) async throws -> User {
-        let response: [User] = try await supabase.database
+        let response: [User] = try await supabase
             .from("profiles")
             .select()
             .eq("id", value: userId.uuidString)

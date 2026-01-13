@@ -63,7 +63,7 @@ class QuoteService: QuoteServiceProtocol {
     
     func fetchQuotes(page: Int, pageSize: Int = 20, category: QuoteCategory? = nil) async throws -> [Quote] {
         // Build query
-        var query = supabase.database
+        var query = supabase
             .from("quotes")
             .select()
         
@@ -75,13 +75,13 @@ class QuoteService: QuoteServiceProtocol {
         // Apply pagination
         let from = page * pageSize
         let to = from + pageSize - 1
-        query = query.range(from: from, to: to)
         
-        // Order by created_at descending
-        query = query.order("created_at", ascending: false)
-        
-        // Execute query
-        let response: [Quote] = try await query.execute().value
+        // Order by created_at descending and apply range
+        let response: [Quote] = try await query
+            .order("created_at", ascending: false)
+            .range(from: from, to: to)
+            .execute()
+            .value
         
         // Cache the results
         cache.cacheQuotes(response)
@@ -97,28 +97,31 @@ class QuoteService: QuoteServiceProtocol {
             return []
         }
         
-        // Use the search_quotes function from the database
-        let response: [Quote] = try await supabase.database
-            .rpc("search_quotes", params: [
-                "search_query": trimmedQuery,
-                "search_category": nil as String?,
-                "page_num": 0,
-                "page_size": 100
-            ])
-            .execute()
-            .value
+        // Simple search using ilike for case-insensitive matching
+        let response: [Quote]
         
-        // Filter by search type if needed
         switch searchType {
         case .keyword:
-            // Already filtered by the function
-            return response
+            // Search in both text and author
+            response = try await supabase
+                .from("quotes")
+                .select()
+                .or("text.ilike.%\(trimmedQuery)%,author.ilike.%\(trimmedQuery)%")
+                .limit(100)
+                .execute()
+                .value
         case .author:
-            // Filter to only author matches
-            return response.filter { quote in
-                quote.author.localizedCaseInsensitiveContains(trimmedQuery)
-            }
+            // Search only in author
+            response = try await supabase
+                .from("quotes")
+                .select()
+                .ilike("author", pattern: "%\(trimmedQuery)%")
+                .limit(100)
+                .execute()
+                .value
         }
+        
+        return response
     }
     
     func getQuoteOfTheDay() async throws -> Quote {
@@ -127,15 +130,26 @@ class QuoteService: QuoteServiceProtocol {
             return cachedQOTD
         }
         
-        // Use the get_quote_of_day function from the database
-        let response: [Quote] = try await supabase.database
-            .rpc("get_quote_of_day", params: [:])
+        // Get a deterministic quote based on today's date
+        // This ensures the same quote is returned for the same day
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let daysSinceEpoch = Int(today.timeIntervalSince1970 / 86400)
+        
+        // Fetch all quotes and select one based on the day
+        let allQuotes: [Quote] = try await supabase
+            .from("quotes")
+            .select()
             .execute()
             .value
         
-        guard let quote = response.first else {
+        guard !allQuotes.isEmpty else {
             throw QuoteServiceError.quoteOfTheDayNotFound
         }
+        
+        // Use modulo to get a consistent quote for today
+        let index = daysSinceEpoch % allQuotes.count
+        let quote = allQuotes[index]
         
         // Cache the QOTD
         cache.cacheQuoteOfTheDay(quote)

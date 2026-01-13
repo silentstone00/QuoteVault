@@ -106,7 +106,7 @@ This plan implements QuoteVault as a SwiftUI iOS app with Supabase backend. Task
   - Confirm Quote of the Day displays correctly
   - Ask user if questions arise
 
-- [-] 7. Favorites and Collections Module
+- [x] 7. Favorites and Collections Module
   - [x] 7.1 Implement CollectionManager protocol and class
     - Create `CollectionManagerProtocol` with favorites and collections methods
     - Implement local caching with UserDefaults for offline support
@@ -126,7 +126,7 @@ This plan implements QuoteVault as a SwiftUI iOS app with Supabase backend. Task
     - Handle optimistic updates with rollback on failure
     - _Requirements: 4.1, 4.2, 5.1, 5.3, 5.4, 5.6_
 
-  - [-] 7.4 Build favorites and collections UI
+  - [x] 7.4 Build favorites and collections UI
     - Create `FavoritesView` showing all favorited quotes
     - Create `CollectionsListView` showing user collections
     - Create `CollectionDetailView` showing quotes in a collection
@@ -141,34 +141,34 @@ This plan implements QuoteVault as a SwiftUI iOS app with Supabase backend. Task
   - Confirm offline favorites work
   - Ask user if questions arise
 
-- [ ] 9. User Profile Module
-  - [ ] 9.1 Extend AuthService for profile management
+- [x] 9. User Profile Module
+  - [x] 9.1 Extend AuthService for profile management
     - Add `updateProfile(name:avatarData:)` method
     - Implement avatar upload to Supabase Storage
     - Handle profile fetch and caching
     - _Requirements: 2.1, 2.2, 2.3, 2.4_
 
-  - [ ] 9.2 Build profile UI
+  - [x] 9.2 Build profile UI
     - Create `ProfileView` with name and avatar display
     - Add edit mode for updating profile information
     - Implement image picker for avatar selection
     - Add logout button
     - _Requirements: 2.1, 2.2, 2.3, 2.4_
 
-- [ ] 10. Sharing Module
-  - [ ] 10.1 Implement ShareGenerator
+- [x] 10. Sharing Module
+  - [x] 10.1 Implement ShareGenerator
     - Create `ShareGeneratorProtocol` with text and card generation methods
     - Implement 3 card styles: minimal, gradient, dark
     - Use SwiftUI view snapshot for image generation
     - Add photo library save functionality
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_
 
-  - [ ] 10.2 Write property test for quote card generation
+  - [x] 10.2 Write property test for quote card generation
     - **Property 13: Quote Card Contains Required Content**
     - Verify generated cards contain quote text and author
     - **Validates: Requirements 8.2**
 
-  - [ ] 10.3 Build sharing UI
+  - [x] 10.3 Build sharing UI
     - Add share button to `QuoteCardView`
     - Create `ShareOptionsSheet` with text share and card options
     - Create `CardStylePicker` for selecting card template
@@ -182,8 +182,8 @@ This plan implements QuoteVault as a SwiftUI iOS app with Supabase backend. Task
   - Confirm photo save with permissions
   - Ask user if questions arise
 
-- [ ] 12. Theme and Settings Module
-  - [ ] 12.1 Implement ThemeManager
+- [x] 12. Theme and Settings Module
+  - [x] 12.1 Implement ThemeManager
     - Create `ThemeManagerProtocol` with color scheme, accent, font size methods
     - Implement local persistence with UserDefaults
     - Add cloud sync for logged-in users
@@ -191,17 +191,17 @@ This plan implements QuoteVault as a SwiftUI iOS app with Supabase backend. Task
     - Define font sizes: small, medium, large, extraLarge
     - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7_
 
-  - [ ] 12.2 Write property test for theme settings
+  - [x] 12.2 Write property test for theme settings
     - **Property 14: Theme Settings Round-Trip**
     - Test setting and reading color scheme, accent color, font size
     - **Validates: Requirements 9.1, 9.2, 9.4, 9.5, 9.6**
 
-  - [ ] 12.3 Create SettingsViewModel
+  - [x] 12.3 Create SettingsViewModel
     - Implement state bindings for all theme settings
     - Add notification preference handling
     - _Requirements: 9.1, 9.2, 9.4, 9.5_
 
-  - [ ] 12.4 Build settings UI
+  - [x] 12.4 Build settings UI
     - Create `SettingsView` with all preference options
     - Add dark/light mode toggle
     - Add accent color picker with visual swatches
@@ -209,7 +209,7 @@ This plan implements QuoteVault as a SwiftUI iOS app with Supabase backend. Task
     - Add notification time picker
     - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5_
 
-  - [ ] 12.5 Apply theme throughout app
+  - [x] 12.5 Apply theme throughout app
     - Inject `ThemeManager` via environment
     - Update all views to use theme colors and font sizes
     - Ensure consistent theming across all screens
@@ -297,14 +297,14 @@ This plan implements QuoteVault as a SwiftUI iOS app with Supabase backend. Task
     - Display appropriate error messages for failed requests
     - _Requirements: 11.2, 11.4_
 
-- [ ] 17. Navigation and App Structure
-  - [ ] 17.1 Implement main tab navigation
+- [x] 17. Navigation and App Structure
+  - [x] 17.1 Implement main tab navigation
     - Create `MainTabView` with Home, Favorites, Collections, Settings tabs
     - Add tab bar icons and labels
     - Handle auth state for tab visibility
     - _Requirements: All UI requirements_
 
-  - [ ] 17.2 Wire up app entry point
+  - [x] 17.2 Wire up app entry point
     - Update `QuoteVaultApp.swift` with environment objects
     - Add auth state routing (login vs main app)
     - Configure appearance and theme on launch
