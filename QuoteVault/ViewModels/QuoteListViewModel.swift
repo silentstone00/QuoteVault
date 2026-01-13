@@ -122,16 +122,34 @@ class QuoteListViewModel: ObservableObject {
     func refresh() async {
         currentPage = 0
         hasMorePages = true
+        errorMessage = nil
         
-        do {
-            let fetchedQuotes = try await quoteService.refreshQuotes()
-            quotes = fetchedQuotes
-            
-            // Also refresh QOTD
-            await loadQuoteOfTheDay()
-            
-        } catch {
-            errorMessage = "Failed to refresh quotes"
+        // Try up to 2 times with retry
+        var attempts = 0
+        let maxAttempts = 2
+        
+        while attempts < maxAttempts {
+            do {
+                let fetchedQuotes = try await quoteService.refreshQuotes()
+                quotes = fetchedQuotes
+                
+                // Also refresh QOTD
+                await loadQuoteOfTheDay()
+                
+                // Success - clear any previous error
+                return
+                
+            } catch {
+                attempts += 1
+                if attempts >= maxAttempts {
+                    // Silently fail - just use cached data
+                    // Don't show error message to user
+                    print("Refresh failed - using cached data: \(error.localizedDescription)")
+                } else {
+                    // Wait a bit before retry
+                    try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
+                }
+            }
         }
     }
     

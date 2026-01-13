@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CollectionDetailView: View {
     let collection: QuoteCollection
-    @StateObject private var viewModel = CollectionViewModel()
+    @ObservedObject private var viewModel = CollectionViewModel.shared
     @EnvironmentObject var themeManager: ThemeManager
     @State private var showDeleteAlert = false
     @Environment(\.dismiss) private var dismiss
@@ -145,8 +145,7 @@ struct CollectionQuoteCard: View {
             id: UUID(),
             name: "My Favorites",
             userId: UUID(),
-            createdAt: Date(),
-            quoteCount: 5
+            createdAt: Date()
         ))
     }
 }

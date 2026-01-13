@@ -1,24 +1,6 @@
 {
-  "originHash" : "20bc7753b4b042f4848ef97cb2c6e132c180839a4015a55ead5e5b0d75729607",
+  "originHash" : "ccc727310637079b7355ccf59e7d153c26677020c1a43e177b78cc9df7963c0f",
   "pins" : [
-    {
-      "identity" : "chalk",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/mxcl/Chalk.git",
-      "state" : {
-        "revision" : "a7f58e47a08ca5a84f73acc4bcf6c2c19d990609",
-        "version" : "0.5.0"
-      }
-    },
-    {
-      "identity" : "filecheck",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/llvm-swift/FileCheck.git",
-      "state" : {
-        "revision" : "f7c5f1a9479b33a876a6f5632ca2b92a7ce4b667",
-        "version" : "0.2.6"
-      }
-    },
     {
       "identity" : "supabase-swift",
       "kind" : "remoteSourceControl",
@@ -26,15 +8,6 @@
       "state" : {
         "revision" : "f633f1ce9ff6dac9f33a1717d191a6c3985148fa",
         "version" : "2.39.0"
-      }
-    },
-    {
-      "identity" : "swift-argument-parser",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-argument-parser",
-      "state" : {
-        "revision" : "c5d11a805e765f52ba34ec7284bd4fcd6ba68615",
-        "version" : "1.7.0"
       }
     },
     {
@@ -80,15 +53,6 @@
       "state" : {
         "revision" : "45eb0224913ea070ec4fba17291b9e7ecf4749ca",
         "version" : "1.5.1"
-      }
-    },
-    {
-      "identity" : "swiftcheck",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/typelift/SwiftCheck",
-      "state" : {
-        "revision" : "077c096c3ddfc38db223ac8e525ad16ffb987138",
-        "version" : "0.12.0"
       }
     },
     {

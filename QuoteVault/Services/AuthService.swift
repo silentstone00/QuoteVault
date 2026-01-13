@@ -84,23 +84,70 @@ class AuthService: AuthServiceProtocol {
     // MARK: - Public Methods
     
     func signUp(email: String, password: String) async throws -> User {
+        print("🔵 Starting signup for: \(email)")
+        
         // Sign up with Supabase Auth
-        let authResponse = try await supabase.auth.signUp(
-            email: email,
-            password: password
-        )
-        
-        guard let session = authResponse.session else {
-            throw AuthError.signUpFailed("No session returned after sign up")
+        do {
+            let authResponse = try await supabase.auth.signUp(
+                email: email,
+                password: password
+            )
+            
+            print("🔵 Auth signup successful")
+            print("🔵 Session: \(authResponse.session != nil ? "exists" : "nil")")
+            
+            // If email confirmation is required, session will be nil
+            if authResponse.session == nil {
+                print("⚠️ No session - email confirmation may be required")
+                // For now, throw a user-friendly error
+                throw AuthError.signUpFailed("Please check your email to confirm your account")
+            }
+            
+            guard let session = authResponse.session else {
+                print("🔴 No session returned after signup")
+                throw AuthError.signUpFailed("No session returned after sign up")
+            }
+            
+            print("🔵 Session obtained, user ID: \(session.user.id)")
+            print("🔵 User email: \(session.user.email ?? "no email")")
+            print("🔵 Waiting 500ms for trigger...")
+            
+            // Wait a moment for the trigger to create the profile
+            try await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
+            
+            print("🔵 Attempting to fetch profile...")
+            
+            // Try to fetch the user profile (created by trigger)
+            do {
+                let user = try await fetchUserProfile(userId: session.user.id, email: session.user.email ?? email)
+                print("✅ Profile fetched successfully")
+                userSubject.send(user)
+                return user
+            } catch {
+                // If profile doesn't exist, create it manually
+                print("⚠️ Profile not found, error: \(error)")
+                print("🔵 Creating profile manually...")
+                
+                do {
+                    let user = try await createUserProfile(
+                        userId: session.user.id,
+                        email: session.user.email ?? email
+                    )
+                    print("✅ Profile created manually")
+                    userSubject.send(user)
+                    return user
+                } catch {
+                    print("🔴 Failed to create profile manually: \(error)")
+                    throw AuthError.signUpFailed("Database error saving new user: \(error.localizedDescription)")
+                }
+            }
+        } catch let error as AuthError {
+            print("🔴 Auth error: \(error)")
+            throw error
+        } catch {
+            print("🔴 Signup failed with error: \(error)")
+            throw AuthError.signUpFailed("Signup failed: \(error.localizedDescription)")
         }
-        
-        // Fetch the user profile (created automatically by trigger)
-        let user = try await fetchUserProfile(userId: session.user.id)
-        
-        // Update local state
-        userSubject.send(user)
-        
-        return user
     }
     
     func signIn(email: String, password: String) async throws -> User {
@@ -111,7 +158,7 @@ class AuthService: AuthServiceProtocol {
         )
         
         // Fetch the user profile
-        let user = try await fetchUserProfile(userId: session.user.id)
+        let user = try await fetchUserProfile(userId: session.user.id, email: session.user.email ?? email)
         
         // Update local state
         userSubject.send(user)
@@ -132,10 +179,11 @@ class AuthService: AuthServiceProtocol {
     }
     
     func updateProfile(name: String?, avatarData: Data?) async throws {
-        guard let userId = userSubject.value?.id else {
+        guard let currentUser = userSubject.value else {
             throw AuthError.notAuthenticated
         }
         
+        let userId = currentUser.id
         var avatarUrl: String?
         
         // Upload avatar if provided
@@ -174,23 +222,27 @@ class AuthService: AuthServiceProtocol {
             .execute()
         
         // Refresh user profile
-        let updatedUser = try await fetchUserProfile(userId: userId)
+        let updatedUser = try await fetchUserProfile(userId: userId, email: currentUser.email)
         userSubject.send(updatedUser)
     }
     
     func restoreSession() async throws -> User? {
-        // Try to get current session
-        guard let session = try? await supabase.auth.session else {
+        // Try to get current session - don't fail if offline
+        do {
+            let session = try await supabase.auth.session
+            
+            // Fetch user profile
+            let user = try await fetchUserProfile(userId: session.user.id, email: session.user.email ?? "")
+            
+            // Update local state
+            userSubject.send(user)
+            
+            return user
+        } catch {
+            // If offline or network error, return nil instead of throwing
+            print("Session restoration failed (possibly offline): \(error.localizedDescription)")
             return nil
         }
-        
-        // Fetch user profile
-        let user = try await fetchUserProfile(userId: session.user.id)
-        
-        // Update local state
-        userSubject.send(user)
-        
-        return user
     }
     
     // MARK: - Private Methods
@@ -201,7 +253,7 @@ class AuthService: AuthServiceProtocol {
             switch event {
             case .signedIn:
                 if let session = session,
-                   let user = try? await fetchUserProfile(userId: session.user.id) {
+                   let user = try? await fetchUserProfile(userId: session.user.id, email: session.user.email ?? "") {
                     userSubject.send(user)
                 }
             case .signedOut:
@@ -212,19 +264,74 @@ class AuthService: AuthServiceProtocol {
         }
     }
     
-    private func fetchUserProfile(userId: UUID) async throws -> User {
-        let response: [User] = try await supabase
+    private func fetchUserProfile(userId: UUID, email: String) async throws -> User {
+        // Define a struct that matches what we get from the database
+        struct ProfileResponse: Codable {
+            let id: UUID
+            let display_name: String?
+            let avatar_url: String?
+            let preferences: UserPreferences?
+            let created_at: Date
+        }
+        
+        let response: [ProfileResponse] = try await supabase
             .from("profiles")
             .select()
             .eq("id", value: userId.uuidString)
             .execute()
             .value
         
-        guard let user = response.first else {
+        guard let profile = response.first else {
             throw AuthError.profileNotFound
         }
         
-        return user
+        // Construct User with email from auth
+        return User(
+            id: profile.id,
+            email: email,
+            displayName: profile.display_name,
+            avatarUrl: profile.avatar_url,
+            preferences: profile.preferences,
+            createdAt: profile.created_at
+        )
+    }
+    
+    private func createUserProfile(userId: UUID, email: String) async throws -> User {
+        print("🔵 Creating profile for user: \(userId)")
+        
+        // Extract display name from email
+        let displayName = email.components(separatedBy: "@").first ?? "User"
+        print("🔵 Display name: \(displayName)")
+        
+        // Create profile manually
+        struct ProfileInsert: Encodable {
+            let id: String
+            let display_name: String
+        }
+        
+        let insert = ProfileInsert(
+            id: userId.uuidString,
+            display_name: displayName
+        )
+        
+        print("🔵 Inserting profile into database...")
+        
+        do {
+            try await supabase
+                .from("profiles")
+                .insert(insert)
+                .execute()
+            
+            print("✅ Profile inserted successfully")
+        } catch {
+            print("🔴 Profile insert failed: \(error)")
+            throw error
+        }
+        
+        print("🔵 Fetching created profile...")
+        
+        // Fetch the created profile
+        return try await fetchUserProfile(userId: userId, email: email)
     }
 }
 

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CollectionsListView: View {
-    @StateObject private var viewModel = CollectionViewModel()
+    @ObservedObject private var viewModel = CollectionViewModel.shared
     @EnvironmentObject var themeManager: ThemeManager
     
     var body: some View {
@@ -77,6 +77,8 @@ struct CollectionsListView: View {
 
 struct CollectionCard: View {
     let collection: QuoteCollection
+    @ObservedObject private var viewModel = CollectionViewModel.shared
+    @State private var quoteCount: Int = 0
     
     var body: some View {
         HStack {
@@ -94,7 +96,7 @@ struct CollectionCard: View {
                     .font(.headline)
                     .foregroundColor(.primary)
                 
-                Text("\(collection.quoteCount ?? 0) quotes")
+                Text("\(quoteCount) quotes")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
@@ -109,6 +111,9 @@ struct CollectionCard: View {
         .background(Color(.systemBackground))
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.05), radius: 3, x: 0, y: 1)
+        .task {
+            quoteCount = await viewModel.getQuoteCount(for: collection.id)
+        }
     }
 }
 

@@ -215,26 +215,26 @@ This plan implements QuoteVault as a SwiftUI iOS app with Supabase backend. Task
     - Ensure consistent theming across all screens
     - _Requirements: 9.4, 9.5_
 
-- [ ] 13. Notifications Module
-  - [ ] 13.1 Implement NotificationScheduler
+- [x] 13. Notifications Module
+  - [x] 13.1 Implement NotificationScheduler
     - Create `NotificationSchedulerProtocol` with schedule and cancel methods
     - Request notification permissions
     - Schedule daily notifications at user-specified time
     - Include Quote of the Day in notification content
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
 
-  - [ ] 13.2 Write property tests for notifications
+  - [x] 13.2 Write property tests for notifications
     - **Property 11: Notification Time Persistence**
     - **Property 12: Notification Disable Cancels All**
     - **Validates: Requirements 7.2, 7.5**
 
-  - [ ] 13.3 Add notification settings to SettingsView
+  - [x] 13.3 Add notification settings to SettingsView
     - Add enable/disable toggle
     - Add time picker for notification time
     - Handle permission denied state
     - _Requirements: 7.1, 7.2, 7.5_
 
-  - [ ] 13.4 Handle notification deep links
+  - [x] 13.4 Handle notification deep links
     - Configure app to handle notification taps
     - Navigate to Quote of the Day on notification tap
     - _Requirements: 7.4_

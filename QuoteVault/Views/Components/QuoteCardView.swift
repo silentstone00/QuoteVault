@@ -9,7 +9,7 @@ import SwiftUI
 
 struct QuoteCardView: View {
     let quote: Quote
-    @StateObject private var collectionViewModel = CollectionViewModel()
+    @ObservedObject private var collectionViewModel = CollectionViewModel.shared
     @EnvironmentObject var themeManager: ThemeManager
     @State private var showShareSheet = false
     

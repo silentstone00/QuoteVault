@@ -125,6 +125,8 @@ class AuthViewModel: ObservableObject {
             
             currentUser = user
             isAuthenticated = true
+            // Cache auth state
+            UserDefaults.standard.set(true, forKey: "was_authenticated")
             clearForm()
         } catch {
             errorMessage = "Invalid email or password"
@@ -142,6 +144,8 @@ class AuthViewModel: ObservableObject {
             try await authService.signOut()
             currentUser = nil
             isAuthenticated = false
+            // Clear cached auth state
+            UserDefaults.standard.set(false, forKey: "was_authenticated")
             clearForm()
         } catch {
             errorMessage = error.localizedDescription
@@ -178,14 +182,29 @@ class AuthViewModel: ObservableObject {
     func restoreSession() async {
         isLoading = true
         
+        // Check if we have a cached auth state (for offline support)
+        let wasAuthenticated = UserDefaults.standard.bool(forKey: "was_authenticated")
+        
         do {
             if let user = try await authService.restoreSession() {
                 currentUser = user
                 isAuthenticated = true
+                // Cache auth state
+                UserDefaults.standard.set(true, forKey: "was_authenticated")
+            } else if wasAuthenticated {
+                // If we were authenticated before but can't reach server (offline),
+                // keep the authenticated state
+                print("Offline mode - maintaining authenticated state")
+                isAuthenticated = true
             }
         } catch {
-            // Silent fail - no session to restore
-            print("Failed to restore session: \(error.localizedDescription)")
+            // If offline and was previously authenticated, stay authenticated
+            if wasAuthenticated {
+                print("Session restoration failed but was previously authenticated - staying logged in")
+                isAuthenticated = true
+            } else {
+                print("Failed to restore session: \(error.localizedDescription)")
+            }
         }
         
         isLoading = false

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct FavoritesView: View {
-    @StateObject private var viewModel = CollectionViewModel()
+    @ObservedObject private var viewModel = CollectionViewModel.shared
     @EnvironmentObject var themeManager: ThemeManager
     
     var body: some View {

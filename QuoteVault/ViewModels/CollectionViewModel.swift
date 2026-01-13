@@ -12,6 +12,10 @@ import SwiftUI
 /// View model managing favorites and collections state
 @MainActor
 class CollectionViewModel: ObservableObject {
+    // MARK: - Singleton
+    
+    static let shared = CollectionViewModel()
+    
     // MARK: - Published Properties
     
     @Published var favorites: [Quote] = []
@@ -30,7 +34,7 @@ class CollectionViewModel: ObservableObject {
     
     // MARK: - Initialization
     
-    init(collectionManager: CollectionManagerProtocol = CollectionManager()) {
+    private init(collectionManager: CollectionManagerProtocol = CollectionManager()) {
         self.collectionManager = collectionManager
         
         // Subscribe to favorites changes
@@ -141,6 +145,9 @@ class CollectionViewModel: ObservableObject {
     func syncFromCloud() async {
         do {
             try await collectionManager.syncFromCloud()
+        } catch is CancellationError {
+            // Ignore cancellation errors - happens when view disappears
+            print("Sync cancelled - view likely disappeared")
         } catch {
             print("Failed to sync from cloud: \(error.localizedDescription)")
             // Don't show error to user - sync is background operation
@@ -156,5 +163,15 @@ class CollectionViewModel: ObservableObject {
     /// Clear error message
     func clearError() {
         errorMessage = nil
+    }
+    
+    /// Get quote count for a collection
+    func getQuoteCount(for collectionId: UUID) async -> Int {
+        do {
+            let quotes = try await collectionManager.getQuotesInCollection(collectionId: collectionId)
+            return quotes.count
+        } catch {
+            return 0
+        }
     }
 }

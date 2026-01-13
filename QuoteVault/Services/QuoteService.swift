@@ -127,6 +127,8 @@ class QuoteService: QuoteServiceProtocol {
     func getQuoteOfTheDay() async throws -> Quote {
         // Check cache first
         if let cachedQOTD = cache.getCachedQuoteOfTheDay() {
+            // Update widget with cached QOTD
+            WidgetUpdateService.updateWidget(with: cachedQOTD)
             return cachedQOTD
         }
         
@@ -153,6 +155,9 @@ class QuoteService: QuoteServiceProtocol {
         
         // Cache the QOTD
         cache.cacheQuoteOfTheDay(quote)
+        
+        // Update widget with new QOTD
+        WidgetUpdateService.updateWidget(with: quote)
         
         return quote
     }

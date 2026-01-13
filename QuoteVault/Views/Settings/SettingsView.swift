@@ -97,6 +97,45 @@ struct SettingsView: View {
                     Text("Typography")
                 }
                 
+                // Notifications Section
+                Section {
+                    Toggle("Daily Quote Notification", isOn: Binding(
+                        get: { viewModel.notificationsEnabled },
+                        set: { newValue in
+                            Task {
+                                await viewModel.toggleNotifications(newValue)
+                            }
+                        }
+                    ))
+                    .tint(themeManager.accentColor)
+                    
+                    if viewModel.notificationsEnabled {
+                        DatePicker(
+                            "Notification Time",
+                            selection: Binding(
+                                get: { viewModel.notificationTime },
+                                set: { newValue in
+                                    Task {
+                                        await viewModel.updateNotificationTime(newValue)
+                                    }
+                                }
+                            ),
+                            displayedComponents: .hourAndMinute
+                        )
+                        .accentColor(themeManager.accentColor)
+                        
+                        Text("Receive a daily quote notification at your preferred time")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                } header: {
+                    Text("Notifications")
+                } footer: {
+                    if !viewModel.notificationsEnabled {
+                        Text("Enable notifications to receive a daily quote at your preferred time")
+                    }
+                }
+                
                 // About Section
                 Section {
                     HStack {
@@ -129,6 +168,13 @@ struct SettingsView: View {
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.large)
+            .alert("Error", isPresented: $viewModel.showError) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                if let errorMessage = viewModel.errorMessage {
+                    Text(errorMessage)
+                }
+            }
         }
     }
 }

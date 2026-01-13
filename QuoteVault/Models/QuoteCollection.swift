@@ -13,14 +13,12 @@ struct QuoteCollection: Codable, Identifiable {
     var name: String
     let userId: UUID
     let createdAt: Date
-    var quoteCount: Int?
     
     enum CodingKeys: String, CodingKey {
         case id
         case name
         case userId = "user_id"
         case createdAt = "created_at"
-        case quoteCount = "quote_count"
     }
 }
 

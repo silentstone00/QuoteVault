@@ -137,8 +137,7 @@ class CollectionManager: CollectionManagerProtocol {
             id: UUID(),
             name: trimmedName,
             userId: userId,
-            createdAt: Date(),
-            quoteCount: 0
+            createdAt: Date()
         )
         
         let response: [QuoteCollection] = try await supabase
@@ -216,8 +215,10 @@ class CollectionManager: CollectionManagerProtocol {
     }
     
     func syncFromCloud() async throws {
-        // Get current user
+        // Get current user - don't throw if offline
         guard let session = try? await supabase.auth.session else {
+            // If offline or no session, just use cached data
+            print("No session available for sync - using cached data")
             return
         }
         let userId = session.user.id
@@ -244,6 +245,11 @@ class CollectionManager: CollectionManagerProtocol {
             favoritesSubject.send(favoriteQuotes)
             favoriteIds = Set(favoriteQuoteIds)
             localStorage.saveFavorites(favoriteQuotes)
+        } else {
+            // Clear favorites if none found
+            favoritesSubject.send([])
+            favoriteIds = []
+            localStorage.saveFavorites([])
         }
         
         // Sync collections

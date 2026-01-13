@@ -45,14 +45,8 @@ struct AddToCollectionSheet: View {
                                     Image(systemName: "folder")
                                         .foregroundColor(.blue)
                                     
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text(collection.name)
-                                            .foregroundColor(.primary)
-                                        
-                                        Text("\(collection.quoteCount ?? 0) quotes")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                    }
+                                    Text(collection.name)
+                                        .foregroundColor(.primary)
                                     
                                     Spacer()
                                     
@@ -89,8 +83,8 @@ struct AddToCollectionSheet: View {
             createdAt: Date()
         ),
         collections: [
-            QuoteCollection(id: UUID(), name: "Favorites", userId: UUID(), createdAt: Date(), quoteCount: 5),
-            QuoteCollection(id: UUID(), name: "Inspiration", userId: UUID(), createdAt: Date(), quoteCount: 3)
+            QuoteCollection(id: UUID(), name: "Favorites", userId: UUID(), createdAt: Date()),
+            QuoteCollection(id: UUID(), name: "Inspiration", userId: UUID(), createdAt: Date())
         ],
         onAdd: { _ in }
     )
