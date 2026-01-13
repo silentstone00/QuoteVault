@@ -48,6 +48,7 @@ struct CardStylePicker: View {
                 }
             }
             .padding(.horizontal)
+            .padding(.vertical, 4) // Add vertical padding to prevent border clipping
         }
         .onChange(of: photoPickerItem) { newItem in
             Task {

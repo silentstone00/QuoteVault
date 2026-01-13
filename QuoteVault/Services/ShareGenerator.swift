@@ -84,18 +84,36 @@ class ShareGenerator: ShareGeneratorProtocol {
     @MainActor
     private func renderView<Content: View>(_ view: Content) -> UIImage {
         let controller = UIHostingController(rootView: view)
-        let view = controller.view!
+        let hostView = controller.view!
         
         // Set size for the card (Instagram square format)
         let targetSize = CGSize(width: 1080, height: 1080)
-        view.bounds = CGRect(origin: .zero, size: targetSize)
-        view.backgroundColor = .clear
+        hostView.frame = CGRect(origin: .zero, size: targetSize)
+        hostView.backgroundColor = .clear
+        
+        // Add to window temporarily to ensure proper rendering
+        let window = UIWindow(frame: CGRect(origin: .zero, size: targetSize))
+        window.addSubview(hostView)
+        window.makeKeyAndVisible()
+        
+        // Force layout
+        hostView.setNeedsLayout()
+        hostView.layoutIfNeeded()
         
         // Render to image
-        let renderer = UIGraphicsImageRenderer(size: targetSize)
-        return renderer.image { _ in
-            view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1.0
+        format.opaque = false
+        
+        let renderer = UIGraphicsImageRenderer(size: targetSize, format: format)
+        let image = renderer.image { _ in
+            hostView.drawHierarchy(in: CGRect(origin: .zero, size: targetSize), afterScreenUpdates: true)
         }
+        
+        // Clean up
+        hostView.removeFromSuperview()
+        
+        return image
     }
 }
 
@@ -123,14 +141,14 @@ struct QuoteCardStyleView: View {
                 
                 // Quote Text
                 Text(quote.text)
-                    .font(.system(size: 36, weight: .medium, design: .serif))
+                    .font(.system(size: 36, weight: .medium))
                     .foregroundColor(textColor)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 60)
                 
                 // Author
                 Text("— \(quote.author)")
-                    .font(.system(size: 24, weight: .regular, design: .serif))
+                    .font(.system(size: 24, weight: .regular))
                     .foregroundColor(textColor.opacity(0.8))
                 
                 Spacer()
@@ -153,19 +171,29 @@ struct QuoteCardStyleView: View {
     private var backgroundView: some View {
         switch style {
         case .minimal:
-            Color.white
+            Rectangle()
+                .fill(Color.white)
+                .frame(width: 1080, height: 1080)
         case .dark:
-            LinearGradient(
-                colors: [Color(hex: "1a1a2e"), Color(hex: "16213e")],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
+            Rectangle()
+                .fill(
+                    LinearGradient(
+                        colors: [Color(hex: "1a1a2e"), Color(hex: "16213e")],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .frame(width: 1080, height: 1080)
         case .gradient:
-            LinearGradient(
-                colors: gradientColors ?? defaultGradientColors,
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
+            Rectangle()
+                .fill(
+                    LinearGradient(
+                        colors: gradientColors ?? defaultGradientColors,
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .frame(width: 1080, height: 1080)
         case .photo:
             if let photo = customPhoto {
                 Image(uiImage: photo)
@@ -174,7 +202,9 @@ struct QuoteCardStyleView: View {
                     .frame(width: 1080, height: 1080)
                     .clipped()
             } else {
-                Color.gray
+                Rectangle()
+                    .fill(Color.gray)
+                    .frame(width: 1080, height: 1080)
             }
         }
     }

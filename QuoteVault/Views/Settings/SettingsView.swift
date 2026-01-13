@@ -196,13 +196,16 @@ struct AccentColorSwatch: View {
                 if isSelected {
                     Circle()
                         .strokeBorder(Color.primary, lineWidth: 3)
-                        .frame(width: 50, height: 50)
+                        .frame(width: 52, height: 52)
+                        .transition(.scale.combined(with: .opacity))
                     
                     Image(systemName: "checkmark")
                         .foregroundColor(.white)
                         .font(.system(size: 16, weight: .bold))
+                        .transition(.scale.combined(with: .opacity))
                 }
             }
+            .animation(.easeInOut(duration: 0.2), value: isSelected)
         }
         .buttonStyle(.plain)
     }

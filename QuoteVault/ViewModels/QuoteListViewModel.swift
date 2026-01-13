@@ -19,7 +19,7 @@ class QuoteListViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var isLoadingMore = false
     @Published var errorMessage: String?
-    @Published var selectedCategory: QuoteCategory?
+    @Published var selectedCategory: QuoteCategory? = .motivation // Default to Motivation
     @Published var searchQuery = ""
     @Published var hasMorePages = true
     

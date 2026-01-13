@@ -1,0 +1,48 @@
+{
+  "source": "/Users/silentstone/Documents/xcode/QuoteVault/QuoteVaultWidget/QuoteWidgetEntryView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "— %@",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 57
+        }
+      },
+      {
+        "comment": "",
+        "key": "Quote of the Day",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 112
+        }
+      },
+      {
+        "comment": "",
+        "key": "— %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 127
+        }
+      },
+      {
+        "comment": "",
+        "key": "Open QuoteVault",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 163
+        }
+      },
+      {
+        "comment": "",
+        "key": "to see your daily quote",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 167
+        }
+      }
+    ]
+  },
+  "version": 1
+}

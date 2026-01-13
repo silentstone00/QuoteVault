@@ -12,69 +12,121 @@ struct QuoteCardView: View {
     @ObservedObject private var collectionViewModel = CollectionViewModel.shared
     @EnvironmentObject var themeManager: ThemeManager
     @State private var showShareSheet = false
+    @State private var showCopyFeedback = false
+    let onFavoriteToggle: ((String) -> Void)?
     
     var isFavorited: Bool {
         collectionViewModel.isFavorite(quoteId: quote.id)
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            // Quote Text
-            Text(quote.text)
-                .font(.system(size: themeManager.quoteFontSize))
+        VStack(alignment: .leading, spacing: 0) {
+            // Quote Text with quotation marks
+            Text("\"\(quote.text)\"")
+                .font(.system(size: themeManager.quoteFontSize + 2))
                 .foregroundColor(.primary)
                 .lineLimit(nil)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 24)
             
-            // Author and Category
-            HStack {
-                Text("— \(quote.author)")
+            // Thin divider
+            Divider()
+                .background(Color.gray.opacity(0.3))
+                .padding(.horizontal, 24)
+            
+            // Author and Actions
+            HStack(spacing: 16) {
+                // Author name on left
+                Text(quote.author)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                 
                 Spacer()
                 
-                CategoryBadge(category: quote.category)
-            }
-            
-            // Actions
-            HStack(spacing: 16) {
-                // Favorite Button
+                // Copy icon
                 Button(action: {
-                    Task {
-                        await collectionViewModel.toggleFavorite(quote: quote)
-                    }
+                    copyToClipboard()
                 }) {
-                    HStack(spacing: 4) {
-                        Image(systemName: isFavorited ? "heart.fill" : "heart")
-                        Text(isFavorited ? "Favorited" : "Favorite")
-                            .font(.caption)
-                    }
-                    .foregroundColor(isFavorited ? .red : .gray)
+                    Image(systemName: "doc.on.doc")
+                        .font(.system(size: 16))
+                        .foregroundColor(.secondary)
                 }
                 
-                Spacer()
-                
-                // Share Button
+                // Share icon
                 Button(action: {
                     showShareSheet = true
                 }) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "square.and.arrow.up")
-                        Text("Share")
-                            .font(.caption)
-                    }
-                    .foregroundColor(.blue)
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: 16))
+                        .foregroundColor(.secondary)
                 }
             }
-            .padding(.top, 4)
+            .padding(.horizontal, 24)
+            .padding(.vertical, 16)
         }
-        .padding()
         .background(Color(.secondarySystemGroupedBackground))
         .cornerRadius(12)
-        .shadow(color: .black.opacity(0.05), radius: 3, x: 0, y: 1)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(isFavorited ? Color.pink : Color.clear, lineWidth: 2)
+        )
+        .onTapGesture(count: 2) {
+            handleDoubleTap()
+        }
         .sheet(isPresented: $showShareSheet) {
             ShareOptionsSheet(quote: quote)
         }
+    }
+    
+    private func copyToClipboard() {
+        let textToCopy = "\"\(quote.text)\" — \(quote.author)"
+        UIPasteboard.general.string = textToCopy
+        
+        // Haptic feedback
+        let generator = UIImpactFeedbackGenerator(style: .light)
+        generator.impactOccurred()
+        
+        // Show feedback
+        showCopyFeedback = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            showCopyFeedback = false
+        }
+    }
+    
+    private func handleDoubleTap() {
+        // Haptic feedback
+        let generator = UIImpactFeedbackGenerator(style: .medium)
+        generator.impactOccurred()
+        
+        Task {
+            let wasFavorited = isFavorited
+            await collectionViewModel.toggleFavorite(quote: quote)
+            
+            // Notify parent view to show toast
+            await MainActor.run {
+                let message = wasFavorited ? "Removed from Favorites" : "Added to Favorites"
+                onFavoriteToggle?(message)
+            }
+        }
+    }
+}
+
+// MARK: - Toast View
+
+struct ToastView: View {
+    let message: String
+    
+    var body: some View {
+        Text(message)
+            .font(.subheadline)
+            .fontWeight(.medium)
+            .foregroundColor(.white)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(
+                Capsule()
+                    .fill(Color.black.opacity(0.8))
+            )
     }
 }
 
@@ -111,12 +163,15 @@ struct CategoryBadge: View {
 }
 
 #Preview {
-    QuoteCardView(quote: Quote(
-        id: UUID(),
-        text: "The only way to do great work is to love what you do.",
-        author: "Steve Jobs",
-        category: .motivation,
-        createdAt: Date()
-    ))
+    QuoteCardView(
+        quote: Quote(
+            id: UUID(),
+            text: "The only way to do great work is to love what you do.",
+            author: "Steve Jobs",
+            category: .motivation,
+            createdAt: Date()
+        ),
+        onFavoriteToggle: nil
+    )
     .padding()
 }

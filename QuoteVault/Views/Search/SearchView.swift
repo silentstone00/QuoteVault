@@ -10,6 +10,8 @@ import SwiftUI
 struct SearchView: View {
     @StateObject private var viewModel = QuoteListViewModel()
     @EnvironmentObject var themeManager: ThemeManager
+    @State private var toastMessage: String?
+    @State private var showToast = false
     
     var body: some View {
         NavigationView {
@@ -21,16 +23,6 @@ struct SearchView: View {
                     // Search Bar
                     SearchBar(text: $viewModel.searchQuery)
                         .padding()
-                    
-                    // Category Filter
-                    CategoryFilterView(
-                        selectedCategory: $viewModel.selectedCategory,
-                        onCategorySelected: { category in
-                            Task {
-                                await viewModel.filterByCategory(category)
-                            }
-                        }
-                    )
                     
                     // Results
                     if viewModel.isLoading && viewModel.quotes.isEmpty {
@@ -49,7 +41,9 @@ struct SearchView: View {
                         ScrollView {
                             LazyVStack(spacing: 12) {
                                 ForEach(viewModel.quotes) { quote in
-                                    QuoteCardView(quote: quote)
+                                    QuoteCardView(quote: quote, onFavoriteToggle: { message in
+                                        showToastMessage(message)
+                                    })
                                         .environmentObject(themeManager)
                                         .padding(.horizontal)
                                         .onAppear {
@@ -86,6 +80,16 @@ struct SearchView: View {
                         .padding()
                     }
                 }
+                
+                // Toast at bottom
+                if showToast, let message = toastMessage {
+                    VStack {
+                        Spacer()
+                        ToastView(message: message)
+                            .padding(.bottom, 30)
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
+                }
             }
             .navigationTitle("Discover")
             .navigationBarTitleDisplayMode(.large)
@@ -93,6 +97,20 @@ struct SearchView: View {
                 if viewModel.quotes.isEmpty {
                     await viewModel.loadQuotes()
                 }
+            }
+        }
+    }
+    
+    private func showToastMessage(_ message: String) {
+        toastMessage = message
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+            showToast = true
+        }
+        
+        // Auto-hide after 2 seconds
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                showToast = false
             }
         }
     }

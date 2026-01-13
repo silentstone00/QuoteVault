@@ -37,19 +37,20 @@ struct SmallWidgetView: View {
     let quote: Quote
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
             // Quote icon
             Image(systemName: "quote.bubble.fill")
-                .font(.title3)
+                .font(.system(size: 16))
                 .foregroundColor(categoryColor)
             
             Spacer()
             
-            // Quote text (truncated)
-            Text(quote.text)
+            // Quote text with quotation marks
+            Text("\"\(quote.text)\"")
                 .font(.system(size: 13, weight: .medium))
-                .lineLimit(4)
+                .lineLimit(5)
                 .foregroundColor(.primary)
+                .minimumScaleFactor(0.9)
             
             Spacer()
             
@@ -59,7 +60,7 @@ struct SmallWidgetView: View {
                 .foregroundColor(.secondary)
                 .lineLimit(1)
         }
-        .padding(12)
+        .padding(10)
         .containerBackground(for: .widget) {
             LinearGradient(
                 colors: [categoryColor.opacity(0.3), categoryColor.opacity(0.1)],
@@ -86,40 +87,43 @@ struct MediumWidgetView: View {
     let quote: Quote
     
     var body: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: 12) {
             // Left side - Icon
             VStack {
                 Image(systemName: "quote.bubble.fill")
-                    .font(.system(size: 40))
+                    .font(.system(size: 36))
                     .foregroundColor(categoryColor)
                 
                 Spacer()
                 
                 // Category badge
                 Text(quote.category.rawValue.capitalized)
-                    .font(.system(size: 10, weight: .semibold))
+                    .font(.system(size: 9, weight: .semibold))
                     .foregroundColor(.white)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 3)
                     .background(categoryColor)
-                    .cornerRadius(8)
+                    .cornerRadius(6)
+                    .fixedSize()
+                    .lineLimit(1)
             }
-            .frame(width: 60)
+            .frame(width: 50)
             
             // Right side - Quote content
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 6) {
                 // Title
                 Text("Quote of the Day")
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.system(size: 11, weight: .semibold))
                     .foregroundColor(.secondary)
                 
                 Spacer()
                 
-                // Quote text
-                Text(quote.text)
+                // Quote text with quotation marks
+                Text("\"\(quote.text)\"")
                     .font(.system(size: 15, weight: .medium))
                     .lineLimit(4)
                     .foregroundColor(.primary)
+                    .minimumScaleFactor(0.9)
                 
                 Spacer()
                 
@@ -130,7 +134,7 @@ struct MediumWidgetView: View {
                     .lineLimit(1)
             }
         }
-        .padding(16)
+        .padding(12)
         .containerBackground(for: .widget) {
             LinearGradient(
                 colors: [categoryColor.opacity(0.3), categoryColor.opacity(0.1)],

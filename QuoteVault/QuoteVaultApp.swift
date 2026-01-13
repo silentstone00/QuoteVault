@@ -75,11 +75,21 @@ struct QuoteVaultApp: App {
     }
     
     private func configureAppearance() {
-        // Configure navigation bar appearance
+        // Configure navigation bar appearance with reduced spacing
         let appearance = UINavigationBarAppearance()
         appearance.configureWithDefaultBackground()
+        
+        // Reduce large title top padding
+        appearance.largeTitleTextAttributes = [
+            .font: UIFont.systemFont(ofSize: 34, weight: .bold)
+        ]
+        
         UINavigationBar.appearance().standardAppearance = appearance
         UINavigationBar.appearance().scrollEdgeAppearance = appearance
+        UINavigationBar.appearance().compactAppearance = appearance
+        
+        // Reduce layout margins to minimize spacing
+        UINavigationBar.appearance().layoutMargins = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         
         // Configure tab bar appearance
         let tabBarAppearance = UITabBarAppearance()

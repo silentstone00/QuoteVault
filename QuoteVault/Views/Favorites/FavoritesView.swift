@@ -10,6 +10,8 @@ import SwiftUI
 struct FavoritesView: View {
     @ObservedObject private var viewModel = CollectionViewModel.shared
     @EnvironmentObject var themeManager: ThemeManager
+    @State private var toastMessage: String?
+    @State private var showToast = false
     
     var body: some View {
         ZStack {
@@ -20,23 +22,15 @@ struct FavoritesView: View {
                 EmptyStateView(
                     icon: "heart",
                     title: "No Favorites Yet",
-                    message: "Tap the heart icon on any quote to add it to your favorites"
+                    message: "Double tap any quote to add it to your favorites"
                 )
             } else {
                 ScrollView {
                     LazyVStack(spacing: 12) {
                         ForEach(viewModel.favorites) { quote in
-                            FavoriteQuoteCard(
-                                quote: quote,
-                                onUnfavorite: {
-                                    Task {
-                                        await viewModel.toggleFavorite(quote: quote)
-                                    }
-                                },
-                                onAddToCollection: {
-                                    viewModel.showAddToCollectionSheet(for: quote)
-                                }
-                            )
+                            QuoteCardView(quote: quote, onFavoriteToggle: { message in
+                                showToastMessage(message)
+                            })
                             .environmentObject(themeManager)
                             .padding(.horizontal)
                         }
@@ -58,6 +52,16 @@ struct FavoritesView: View {
                     .padding()
                 }
             }
+            
+            // Toast at bottom
+            if showToast, let message = toastMessage {
+                VStack {
+                    Spacer()
+                    ToastView(message: message)
+                        .padding(.bottom, 30)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+            }
         }
         .sheet(isPresented: $viewModel.showAddToCollection) {
             if let quote = viewModel.selectedQuote {
@@ -73,62 +77,19 @@ struct FavoritesView: View {
             }
         }
     }
-}
-
-// MARK: - Favorite Quote Card
-
-struct FavoriteQuoteCard: View {
-    let quote: Quote
-    let onUnfavorite: () -> Void
-    let onAddToCollection: () -> Void
-    @EnvironmentObject var themeManager: ThemeManager
     
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            // Quote Text
-            Text(quote.text)
-                .font(.system(size: themeManager.quoteFontSize))
-                .foregroundColor(.primary)
-            
-            // Author and Category
-            HStack {
-                Text("— \(quote.author)")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                
-                Spacer()
-                
-                CategoryBadge(category: quote.category)
-            }
-            
-            // Actions
-            HStack(spacing: 16) {
-                Button(action: onUnfavorite) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "heart.slash")
-                        Text("Unfavorite")
-                            .font(.caption)
-                    }
-                    .foregroundColor(.red)
-                }
-                
-                Spacer()
-                
-                Button(action: onAddToCollection) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "folder.badge.plus")
-                        Text("Add to Collection")
-                            .font(.caption)
-                    }
-                    .foregroundColor(.blue)
-                }
-            }
-            .padding(.top, 4)
+    private func showToastMessage(_ message: String) {
+        toastMessage = message
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+            showToast = true
         }
-        .padding()
-        .background(Color(.secondarySystemGroupedBackground))
-        .cornerRadius(12)
-        .shadow(color: .black.opacity(0.05), radius: 3, x: 0, y: 1)
+        
+        // Auto-hide after 2 seconds
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                showToast = false
+            }
+        }
     }
 }
 

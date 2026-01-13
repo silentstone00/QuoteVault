@@ -35,7 +35,8 @@ Successfully redesigned the share feature with a simplified, modern UI that incl
 - Created `GradientStyleOption` component:
   - Shows random icon (shuffle) with "random" text overlay
   - Toned down opacity (0.3) for subtle appearance
-  - Tapping generates new random gradient each time
+  - **Fixed**: Tapping generates new random gradient and updates PREVIEW, not the option background
+  - Option background stays static (orange to pink gradient)
 - Updated picker to pass photo and gradient state
 - Style order: Minimal → Dark → Gradient → Photo
 
@@ -43,6 +44,7 @@ Successfully redesigned the share feature with a simplified, modern UI that incl
 - Added support for `customPhoto` and `gradientColors` parameters
 - Added semi-transparent black overlay (0.4 opacity) for photo backgrounds
 - Updated to use dynamic gradient colors instead of category-based defaults
+- **Fixed**: Photo backgrounds now use GeometryReader to maintain same size as other styles
 - Maintains proper text visibility on all background types
 
 ## Features
@@ -65,25 +67,31 @@ Successfully redesigned the share feature with a simplified, modern UI that incl
   - Teal → Green
   - Yellow → Orange
   - Mint → Cyan
-- Tapping the gradient style preview generates a new random gradient
+- **Behavior**: Tapping the gradient option selects it AND generates a new random gradient for the preview
+- The gradient option itself keeps a static orange-to-pink gradient background
 - Visual indicator: shuffle icon with "random" text (subtle, 30% opacity)
 
 ### Photo Upload
 - Native iOS photo picker integration
 - Supports all image formats
 - Automatically switches to photo style when photo is selected
-- Photo is scaled to fill 1080x1080 card with proper cropping
+- **Photo maintains same preview size as other styles** (300pt height)
+- Photo is scaled to fill the preview area with proper cropping
 - Semi-transparent overlay ensures text remains readable
 
 ## User Experience
 
 1. User opens share sheet
-2. Sees live preview of quote card
+2. Sees live preview of quote card (300pt height for all styles)
 3. Selects background style (Minimal/Dark/Gradient/Photo)
-4. For Gradient: can tap to generate random colors
-5. For Photo: taps to select from photo library
+4. For Gradient: tapping generates random colors and updates the preview
+5. For Photo: taps to select from photo library, photo fills preview at same size
 6. Taps "Share as Image" to generate and share
 7. Or taps "Share as Text" for plain text sharing
+
+## Fixes Applied
+✅ **Photo size issue**: Photos now maintain the same preview size as Minimal/Dark/Gradient styles using GeometryReader
+✅ **Gradient random behavior**: Tapping gradient option now changes the preview gradient colors, not the option background itself
 
 ## Build Status
 ✅ **BUILD SUCCEEDED** - All files compile without errors

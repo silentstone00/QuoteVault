@@ -1,0 +1,44 @@
+{
+  "/Users/silentstone/Documents/xcode/QuoteVault/QuoteVault/Config/SupabaseConfig.swift" : {
+    "const-values" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/x86_64/SupabaseConfig.swiftconstvalues",
+    "dependencies" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/x86_64/SupabaseConfig.d",
+    "diagnostics" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/x86_64/SupabaseConfig.dia",
+    "object" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/x86_64/SupabaseConfig.o",
+    "swift-dependencies" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/x86_64/SupabaseConfig.swiftdeps"
+  },
+  "/Users/silentstone/Documents/xcode/QuoteVault/QuoteVault/Models/Quote.swift" : {
+    "const-values" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/x86_64/Quote.swiftconstvalues",
+    "dependencies" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/x86_64/Quote.d",
+    "diagnostics" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/x86_64/Quote.dia",
+    "object" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/x86_64/Quote.o",
+    "swift-dependencies" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/x86_64/Quote.swiftdeps"
+  },
+  "/Users/silentstone/Documents/xcode/QuoteVault/QuoteVault/Models/QuoteCollection.swift" : {
+    "const-values" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/x86_64/QuoteCollection.swiftconstvalues",
+    "dependencies" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/x86_64/QuoteCollection.d",
+    "diagnostics" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/x86_64/QuoteCollection.dia",
+    "object" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/x86_64/QuoteCollection.o",
+    "swift-dependencies" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/x86_64/QuoteCollection.swiftdeps"
+  },
+  "/Users/silentstone/Documents/xcode/QuoteVault/QuoteVault/Models/User.swift" : {
+    "const-values" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/x86_64/User.swiftconstvalues",
+    "dependencies" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/x86_64/User.d",
+    "diagnostics" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/x86_64/User.dia",
+    "object" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/x86_64/User.o",
+    "swift-dependencies" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/x86_64/User.swiftdeps"
+  },
+  "/Users/silentstone/Documents/xcode/QuoteVault/QuoteVault/Services/AuthService.swift" : {
+    "const-values" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/x86_64/AuthService.swiftconstvalues",
+    "dependencies" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/x86_64/AuthService.d",
+    "diagnostics" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/x86_64/AuthService.dia",
+    "object" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/x86_64/AuthService.o",
+    "swift-dependencies" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/x86_64/AuthService.swiftdeps"
+  },
+  "/Users/silentstone/Documents/xcode/QuoteVault/QuoteVault/Services/CollectionManager.swift" : {
+    "const-values" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/x86_64/CollectionManager.swiftconstvalues",
+    "dependencies" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/x86_64/CollectionManager.d",
+    "diagnostics" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/x86_64/CollectionManager.dia",
+    "object" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/x86_64/CollectionManager.o",
+    "swift-dependencies" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/x86_64/CollectionManager.swiftdeps"
+  }
+}

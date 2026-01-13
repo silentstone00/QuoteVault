@@ -15,6 +15,8 @@ struct ShareOptionsSheet: View {
     @State private var currentGradient: [Color] = [Color.orange, Color.pink]
     @State private var isGenerating = false
     @State private var errorMessage: String?
+    @State private var showShareSheet = false
+    @State private var shareItems: [Any] = []
     
     private let shareGenerator = ShareGenerator()
     
@@ -120,10 +122,37 @@ struct ShareOptionsSheet: View {
                     }
                 }
             }
+            .sheet(isPresented: $showShareSheet) {
+                if !shareItems.isEmpty {
+                    ActivityViewController(activityItems: shareItems)
+                }
+            }
         }
         .onAppear {
             // Initialize gradient based on quote category
             currentGradient = getDefaultGradient()
+        }
+        .overlay {
+            // Loading overlay
+            if isGenerating {
+                ZStack {
+                    Color.black.opacity(0.4)
+                        .ignoresSafeArea()
+                    
+                    VStack(spacing: 16) {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            .scaleEffect(1.5)
+                        
+                        Text("Preparing...")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                    }
+                    .padding(32)
+                    .background(Color.black.opacity(0.7))
+                    .cornerRadius(16)
+                }
+            }
         }
     }
     
@@ -140,23 +169,15 @@ struct ShareOptionsSheet: View {
         
         isGenerating = false
         
-        // Share the image
-        let activityVC = UIActivityViewController(activityItems: [image], applicationActivities: nil)
-        
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let rootVC = windowScene.windows.first?.rootViewController {
-            rootVC.present(activityVC, animated: true)
-        }
+        // Set share items and show share sheet
+        shareItems = [image]
+        showShareSheet = true
     }
     
     private func shareText() {
         let text = shareGenerator.generateShareText(quote: quote)
-        let activityVC = UIActivityViewController(activityItems: [text], applicationActivities: nil)
-        
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let rootVC = windowScene.windows.first?.rootViewController {
-            rootVC.present(activityVC, animated: true)
-        }
+        shareItems = [text]
+        showShareSheet = true
     }
     
     private func getDefaultGradient() -> [Color] {
@@ -183,4 +204,23 @@ struct ShareOptionsSheet: View {
         category: .motivation,
         createdAt: Date()
     ))
+}
+
+// MARK: - Activity View Controller Wrapper
+
+struct ActivityViewController: UIViewControllerRepresentable {
+    let activityItems: [Any]
+    let applicationActivities: [UIActivity]? = nil
+    
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        let controller = UIActivityViewController(
+            activityItems: activityItems,
+            applicationActivities: applicationActivities
+        )
+        return controller
+    }
+    
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {
+        // No update needed
+    }
 }

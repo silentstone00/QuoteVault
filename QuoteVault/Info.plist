@@ -8,6 +8,8 @@
 	<string>https://kghefskpruzugcggthua.supabase.co</string>
 	<key>NSUserNotificationsUsageDescription</key>
 	<string>QuoteVault would like to send you daily inspirational quotes at your preferred time.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>QuoteVault needs access to save quote images to your photo library.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

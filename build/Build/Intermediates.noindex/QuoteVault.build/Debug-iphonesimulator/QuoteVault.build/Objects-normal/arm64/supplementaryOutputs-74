@@ -1,0 +1,44 @@
+{
+  "/Users/silentstone/Documents/xcode/QuoteVault/QuoteVault/Services/NotificationScheduler.swift" : {
+    "const-values" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/arm64/NotificationScheduler.swiftconstvalues",
+    "dependencies" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/arm64/NotificationScheduler.d",
+    "diagnostics" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/arm64/NotificationScheduler.dia",
+    "object" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/arm64/NotificationScheduler.o",
+    "swift-dependencies" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/arm64/NotificationScheduler.swiftdeps"
+  },
+  "/Users/silentstone/Documents/xcode/QuoteVault/QuoteVault/Services/QuoteService.swift" : {
+    "const-values" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/arm64/QuoteService.swiftconstvalues",
+    "dependencies" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/arm64/QuoteService.d",
+    "diagnostics" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/arm64/QuoteService.dia",
+    "object" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/arm64/QuoteService.o",
+    "swift-dependencies" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/arm64/QuoteService.swiftdeps"
+  },
+  "/Users/silentstone/Documents/xcode/QuoteVault/QuoteVault/Services/ShareGenerator.swift" : {
+    "const-values" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/arm64/ShareGenerator.swiftconstvalues",
+    "dependencies" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/arm64/ShareGenerator.d",
+    "diagnostics" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/arm64/ShareGenerator.dia",
+    "object" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/arm64/ShareGenerator.o",
+    "swift-dependencies" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/arm64/ShareGenerator.swiftdeps"
+  },
+  "/Users/silentstone/Documents/xcode/QuoteVault/QuoteVault/Services/ThemeManager.swift" : {
+    "const-values" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/arm64/ThemeManager.swiftconstvalues",
+    "dependencies" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/arm64/ThemeManager.d",
+    "diagnostics" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/arm64/ThemeManager.dia",
+    "object" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/arm64/ThemeManager.o",
+    "swift-dependencies" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/arm64/ThemeManager.swiftdeps"
+  },
+  "/Users/silentstone/Documents/xcode/QuoteVault/QuoteVault/Services/WidgetUpdateService.swift" : {
+    "const-values" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/arm64/WidgetUpdateService.swiftconstvalues",
+    "dependencies" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/arm64/WidgetUpdateService.d",
+    "diagnostics" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/arm64/WidgetUpdateService.dia",
+    "object" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/arm64/WidgetUpdateService.o",
+    "swift-dependencies" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/arm64/WidgetUpdateService.swiftdeps"
+  },
+  "/Users/silentstone/Documents/xcode/QuoteVault/QuoteVault/Validators/EmailValidator.swift" : {
+    "const-values" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/arm64/EmailValidator.swiftconstvalues",
+    "dependencies" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/arm64/EmailValidator.d",
+    "diagnostics" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/arm64/EmailValidator.dia",
+    "object" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/arm64/EmailValidator.o",
+    "swift-dependencies" : "/Users/silentstone/Documents/xcode/QuoteVault/build/Build/Intermediates.noindex/QuoteVault.build/Debug-iphonesimulator/QuoteVault.build/Objects-normal/arm64/EmailValidator.swiftdeps"
+  }
+}

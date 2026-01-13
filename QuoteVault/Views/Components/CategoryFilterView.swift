@@ -55,7 +55,12 @@ struct CategoryChip: View {
     let action: () -> Void
     
     var body: some View {
-        Button(action: action) {
+        Button(action: {
+            // Haptic feedback
+            let generator = UIImpactFeedbackGenerator(style: .light)
+            generator.impactOccurred()
+            action()
+        }) {
             Text(title)
                 .font(.subheadline)
                 .fontWeight(isSelected ? .semibold : .regular)
@@ -64,6 +69,10 @@ struct CategoryChip: View {
                 .background(isSelected ? color : Color(.systemGray5))
                 .foregroundColor(isSelected ? .white : .secondary)
                 .cornerRadius(20)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(isSelected ? color : Color.gray.opacity(0.3), lineWidth: 1)
+                )
         }
     }
 }

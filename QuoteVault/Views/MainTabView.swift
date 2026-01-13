@@ -32,7 +32,7 @@ struct MainTabView: View {
             // Library Tab (Favorites + Collections)
             LibraryView()
                 .tabItem {
-                    Label("Library", systemImage: "books.vertical.fill")
+                    Label("Library", systemImage: "book.fill")
                 }
                 .tag(2)
             
