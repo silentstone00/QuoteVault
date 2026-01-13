@@ -13,8 +13,9 @@ import Photos
 /// Card style options for quote sharing
 enum CardStyle: String, CaseIterable {
     case minimal    // Clean white background, simple typography
-    case gradient   // Colorful gradient background
     case dark       // Dark moody background with light text
+    case gradient   // Colorful gradient background
+    case photo      // Custom photo background
     
     var displayName: String {
         rawValue.capitalized
@@ -27,10 +28,13 @@ protocol ShareGeneratorProtocol {
     func generateShareText(quote: Quote) -> String
     
     /// Generate a styled quote card image
-    func generateQuoteCard(quote: Quote, style: CardStyle) async -> UIImage
+    func generateQuoteCard(quote: Quote, style: CardStyle, customPhoto: UIImage?, gradientColors: [Color]?) async -> UIImage
     
     /// Save image to photo library
     func saveToPhotoLibrary(image: UIImage) async throws
+    
+    /// Generate random gradient colors
+    func generateRandomGradient() -> [Color]
 }
 
 /// Share generator implementation
@@ -40,8 +44,8 @@ class ShareGenerator: ShareGeneratorProtocol {
         return "\"\(quote.text)\"\n\n— \(quote.author)"
     }
     
-    func generateQuoteCard(quote: Quote, style: CardStyle) async -> UIImage {
-        let cardView = QuoteCardStyleView(quote: quote, style: style)
+    func generateQuoteCard(quote: Quote, style: CardStyle, customPhoto: UIImage? = nil, gradientColors: [Color]? = nil) async -> UIImage {
+        let cardView = QuoteCardStyleView(quote: quote, style: style, customPhoto: customPhoto, gradientColors: gradientColors)
         return await renderView(cardView)
     }
     
@@ -57,6 +61,22 @@ class ShareGenerator: ShareGeneratorProtocol {
         try await PHPhotoLibrary.shared().performChanges {
             PHAssetChangeRequest.creationRequestForAsset(from: image)
         }
+    }
+    
+    func generateRandomGradient() -> [Color] {
+        let gradients: [[Color]] = [
+            [Color.orange, Color.pink],
+            [Color.pink, Color.purple],
+            [Color.green, Color.blue],
+            [Color.purple, Color.blue],
+            [Color.blue, Color.cyan],
+            [Color.red, Color.orange],
+            [Color.indigo, Color.purple],
+            [Color.teal, Color.green],
+            [Color.yellow, Color.orange],
+            [Color.mint, Color.cyan]
+        ]
+        return gradients.randomElement() ?? [Color.orange, Color.pink]
     }
     
     // MARK: - Private Methods
@@ -84,11 +104,18 @@ class ShareGenerator: ShareGeneratorProtocol {
 struct QuoteCardStyleView: View {
     let quote: Quote
     let style: CardStyle
+    let customPhoto: UIImage?
+    let gradientColors: [Color]?
     
     var body: some View {
         ZStack {
             // Background
             backgroundView
+            
+            // Content with semi-transparent overlay for photo background
+            if style == .photo {
+                Color.black.opacity(0.4)
+            }
             
             // Content
             VStack(spacing: 32) {
@@ -127,33 +154,36 @@ struct QuoteCardStyleView: View {
         switch style {
         case .minimal:
             Color.white
-        case .gradient:
-            LinearGradient(
-                colors: gradientColors,
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
         case .dark:
             LinearGradient(
                 colors: [Color(hex: "1a1a2e"), Color(hex: "16213e")],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
+        case .gradient:
+            LinearGradient(
+                colors: gradientColors ?? defaultGradientColors,
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        case .photo:
+            if let photo = customPhoto {
+                Image(uiImage: photo)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 1080, height: 1080)
+                    .clipped()
+            } else {
+                Color.gray
+            }
         }
     }
     
     private var textColor: Color {
-        switch style {
-        case .minimal:
-            return .black
-        case .gradient:
-            return .white
-        case .dark:
-            return .white
-        }
+        style == .minimal ? .black : .white
     }
     
-    private var gradientColors: [Color] {
+    private var defaultGradientColors: [Color] {
         switch quote.category {
         case .motivation:
             return [Color.orange, Color.pink]

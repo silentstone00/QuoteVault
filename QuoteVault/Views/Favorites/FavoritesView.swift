@@ -12,67 +12,64 @@ struct FavoritesView: View {
     @EnvironmentObject var themeManager: ThemeManager
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                Color(.systemGroupedBackground)
-                    .ignoresSafeArea()
-                
-                if viewModel.favorites.isEmpty {
-                    EmptyStateView(
-                        icon: "heart",
-                        title: "No Favorites Yet",
-                        message: "Tap the heart icon on any quote to add it to your favorites"
-                    )
-                } else {
-                    ScrollView {
-                        LazyVStack(spacing: 12) {
-                            ForEach(viewModel.favorites) { quote in
-                                FavoriteQuoteCard(
-                                    quote: quote,
-                                    onUnfavorite: {
-                                        Task {
-                                            await viewModel.toggleFavorite(quote: quote)
-                                        }
-                                    },
-                                    onAddToCollection: {
-                                        viewModel.showAddToCollectionSheet(for: quote)
+        ZStack {
+            Color(.systemGroupedBackground)
+                .ignoresSafeArea()
+            
+            if viewModel.favorites.isEmpty {
+                EmptyStateView(
+                    icon: "heart",
+                    title: "No Favorites Yet",
+                    message: "Tap the heart icon on any quote to add it to your favorites"
+                )
+            } else {
+                ScrollView {
+                    LazyVStack(spacing: 12) {
+                        ForEach(viewModel.favorites) { quote in
+                            FavoriteQuoteCard(
+                                quote: quote,
+                                onUnfavorite: {
+                                    Task {
+                                        await viewModel.toggleFavorite(quote: quote)
                                     }
-                                )
-                                .environmentObject(themeManager)
-                                .padding(.horizontal)
-                            }
+                                },
+                                onAddToCollection: {
+                                    viewModel.showAddToCollectionSheet(for: quote)
+                                }
+                            )
+                            .environmentObject(themeManager)
+                            .padding(.horizontal)
                         }
-                        .padding(.vertical)
                     }
-                    .refreshable {
-                        await viewModel.syncFromCloud()
-                    }
+                    .padding(.vertical)
                 }
-                
-                // Error Banner
-                if let error = viewModel.errorMessage {
-                    VStack {
-                        Spacer()
-                        ErrorBanner(message: error) {
-                            viewModel.clearError()
-                        }
-                        .padding()
-                    }
+                .refreshable {
+                    await viewModel.syncFromCloud()
                 }
             }
-            .navigationTitle("Favorites")
-            .sheet(isPresented: $viewModel.showAddToCollection) {
-                if let quote = viewModel.selectedQuote {
-                    AddToCollectionSheet(
-                        quote: quote,
-                        collections: viewModel.collections,
-                        onAdd: { collectionId in
-                            Task {
-                                await viewModel.addToCollection(quoteId: quote.id, collectionId: collectionId)
-                            }
-                        }
-                    )
+            
+            // Error Banner
+            if let error = viewModel.errorMessage {
+                VStack {
+                    Spacer()
+                    ErrorBanner(message: error) {
+                        viewModel.clearError()
+                    }
+                    .padding()
                 }
+            }
+        }
+        .sheet(isPresented: $viewModel.showAddToCollection) {
+            if let quote = viewModel.selectedQuote {
+                AddToCollectionSheet(
+                    quote: quote,
+                    collections: viewModel.collections,
+                    onAdd: { collectionId in
+                        Task {
+                            await viewModel.addToCollection(quoteId: quote.id, collectionId: collectionId)
+                        }
+                    }
+                )
             }
         }
     }
@@ -129,7 +126,7 @@ struct FavoriteQuoteCard: View {
             .padding(.top, 4)
         }
         .padding()
-        .background(Color(.systemBackground))
+        .background(Color(.secondarySystemGroupedBackground))
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.05), radius: 3, x: 0, y: 1)
     }

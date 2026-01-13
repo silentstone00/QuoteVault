@@ -22,33 +22,26 @@ struct MainTabView: View {
                 }
                 .tag(0)
             
-            // Favorites Tab
-            FavoritesView()
+            // Discover Tab (formerly Search)
+            SearchView()
                 .tabItem {
-                    Label("Favorites", systemImage: "heart.fill")
+                    Label("Discover", systemImage: "safari")
                 }
                 .tag(1)
             
-            // Collections Tab
-            CollectionsListView()
+            // Library Tab (Favorites + Collections)
+            LibraryView()
                 .tabItem {
-                    Label("Collections", systemImage: "folder.fill")
+                    Label("Library", systemImage: "books.vertical.fill")
                 }
                 .tag(2)
             
-            // Profile Tab
+            // Profile Tab (includes Settings)
             ProfileView()
                 .tabItem {
                     Label("Profile", systemImage: "person.fill")
                 }
                 .tag(3)
-            
-            // Settings Tab
-            SettingsView()
-                .tabItem {
-                    Label("Settings", systemImage: "gear")
-                }
-                .tag(4)
         }
         .accentColor(themeManager.accentColor)
         .onChange(of: notificationDelegate.shouldNavigateToHome) { shouldNavigate in

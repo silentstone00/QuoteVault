@@ -12,61 +12,49 @@ struct CollectionsListView: View {
     @EnvironmentObject var themeManager: ThemeManager
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                Color(.systemGroupedBackground)
-                    .ignoresSafeArea()
-                
-                if viewModel.collections.isEmpty {
-                    EmptyStateView(
-                        icon: "folder",
-                        title: "No Collections Yet",
-                        message: "Create a collection to organize your favorite quotes"
-                    )
-                } else {
-                    ScrollView {
-                        LazyVStack(spacing: 12) {
-                            ForEach(viewModel.collections) { collection in
-                                NavigationLink(destination: CollectionDetailView(collection: collection)
-                                    .environmentObject(themeManager)) {
-                                    CollectionCard(collection: collection)
-                                }
-                                .buttonStyle(PlainButtonStyle())
+        ZStack {
+            Color(.systemGroupedBackground)
+                .ignoresSafeArea()
+            
+            if viewModel.collections.isEmpty {
+                EmptyStateView(
+                    icon: "folder",
+                    title: "No Collections Yet",
+                    message: "Create a collection to organize your favorite quotes"
+                )
+            } else {
+                ScrollView {
+                    LazyVStack(spacing: 12) {
+                        ForEach(viewModel.collections) { collection in
+                            NavigationLink(destination: CollectionDetailView(collection: collection)
+                                .environmentObject(themeManager)) {
+                                CollectionCard(collection: collection)
                             }
+                            .buttonStyle(PlainButtonStyle())
                         }
-                        .padding()
                     }
-                    .refreshable {
-                        await viewModel.syncFromCloud()
-                    }
+                    .padding()
                 }
-                
-                // Error Banner
-                if let error = viewModel.errorMessage {
-                    VStack {
-                        Spacer()
-                        ErrorBanner(message: error) {
-                            viewModel.clearError()
-                        }
-                        .padding()
-                    }
+                .refreshable {
+                    await viewModel.syncFromCloud()
                 }
             }
-            .navigationTitle("Collections")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        viewModel.showCreateCollection = true
-                    }) {
-                        Image(systemName: "plus")
+            
+            // Error Banner
+            if let error = viewModel.errorMessage {
+                VStack {
+                    Spacer()
+                    ErrorBanner(message: error) {
+                        viewModel.clearError()
                     }
+                    .padding()
                 }
             }
-            .sheet(isPresented: $viewModel.showCreateCollection) {
-                CreateCollectionSheet { name in
-                    Task {
-                        await viewModel.createCollection(name: name)
-                    }
+        }
+        .sheet(isPresented: $viewModel.showCreateCollection) {
+            CreateCollectionSheet { name in
+                Task {
+                    await viewModel.createCollection(name: name)
                 }
             }
         }
@@ -108,7 +96,7 @@ struct CollectionCard: View {
                 .foregroundColor(.gray)
         }
         .padding()
-        .background(Color(.systemBackground))
+        .background(Color(.secondarySystemGroupedBackground))
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.05), radius: 3, x: 0, y: 1)
         .task {

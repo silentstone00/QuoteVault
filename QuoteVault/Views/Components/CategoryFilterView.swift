@@ -14,17 +14,7 @@ struct CategoryFilterView: View {
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
-                // All Categories chip
-                CategoryChip(
-                    title: "All",
-                    isSelected: selectedCategory == nil,
-                    color: .gray
-                ) {
-                    selectedCategory = nil
-                    onCategorySelected(nil)
-                }
-                
-                // Individual category chips
+                // Individual category chips (no "All" option)
                 ForEach(QuoteCategory.allCases, id: \.self) { category in
                     CategoryChip(
                         title: category.displayName,
@@ -71,8 +61,8 @@ struct CategoryChip: View {
                 .fontWeight(isSelected ? .semibold : .regular)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
-                .background(isSelected ? color : Color(.systemGray6))
-                .foregroundColor(isSelected ? .white : .primary)
+                .background(isSelected ? color : Color(.systemGray5))
+                .foregroundColor(isSelected ? .white : .secondary)
                 .cornerRadius(20)
         }
     }

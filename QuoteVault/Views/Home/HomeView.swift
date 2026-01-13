@@ -28,10 +28,6 @@ struct HomeView: View {
                                 .padding(.top, 8)
                         }
                         
-                        // Search Bar
-                        SearchBar(text: $viewModel.searchQuery)
-                            .padding(.horizontal)
-                        
                         // Category Filter
                         CategoryFilterView(
                             selectedCategory: $viewModel.selectedCategory,
@@ -106,6 +102,12 @@ struct HomeView: View {
 
 struct QuoteOfTheDayCard: View {
     let quote: Quote
+    @ObservedObject private var collectionViewModel = CollectionViewModel.shared
+    @State private var showShareSheet = false
+    
+    var isFavorited: Bool {
+        collectionViewModel.isFavorite(quoteId: quote.id)
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -130,6 +132,38 @@ struct QuoteOfTheDayCard: View {
                 Spacer()
                 CategoryBadge(category: quote.category)
             }
+            
+            // Actions
+            HStack(spacing: 16) {
+                // Favorite Button
+                Button(action: {
+                    Task {
+                        await collectionViewModel.toggleFavorite(quote: quote)
+                    }
+                }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: isFavorited ? "heart.fill" : "heart")
+                        Text(isFavorited ? "Favorited" : "Favorite")
+                            .font(.caption)
+                    }
+                    .foregroundColor(isFavorited ? .red : .orange)
+                }
+                
+                Spacer()
+                
+                // Share Button
+                Button(action: {
+                    showShareSheet = true
+                }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "square.and.arrow.up")
+                        Text("Share")
+                            .font(.caption)
+                    }
+                    .foregroundColor(.orange)
+                }
+            }
+            .padding(.top, 4)
         }
         .padding()
         .background(
@@ -141,6 +175,9 @@ struct QuoteOfTheDayCard: View {
         )
         .cornerRadius(16)
         .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 2)
+        .sheet(isPresented: $showShareSheet) {
+            ShareOptionsSheet(quote: quote)
+        }
     }
 }
 

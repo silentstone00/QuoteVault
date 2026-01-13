@@ -69,7 +69,7 @@ struct QuoteCardView: View {
             .padding(.top, 4)
         }
         .padding()
-        .background(Color(.systemBackground))
+        .background(Color(.secondarySystemGroupedBackground))
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.05), radius: 3, x: 0, y: 1)
         .sheet(isPresented: $showShareSheet) {

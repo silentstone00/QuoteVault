@@ -10,10 +10,10 @@ import SwiftUI
 struct ShareOptionsSheet: View {
     @Environment(\.dismiss) private var dismiss
     let quote: Quote
-    @State private var selectedStyle: CardStyle = .gradient
-    @State private var generatedImage: UIImage?
+    @State private var selectedStyle: CardStyle = .minimal
+    @State private var selectedPhoto: UIImage?
+    @State private var currentGradient: [Color] = [Color.orange, Color.pink]
     @State private var isGenerating = false
-    @State private var showSaveSuccess = false
     @State private var errorMessage: String?
     
     private let shareGenerator = ShareGenerator()
@@ -28,38 +28,38 @@ struct ShareOptionsSheet: View {
                             .font(.headline)
                             .padding(.horizontal)
                         
-                        if let image = generatedImage {
-                            Image(uiImage: image)
-                                .resizable()
-                                .scaledToFit()
-                                .cornerRadius(12)
-                                .shadow(radius: 5)
-                                .padding(.horizontal)
-                        } else {
-                            QuoteCardPreview(quote: quote, style: selectedStyle)
-                                .frame(height: 300)
-                                .padding(.horizontal)
-                        }
+                        QuoteCardPreview(
+                            quote: quote,
+                            style: selectedStyle,
+                            customPhoto: selectedPhoto,
+                            gradientColors: currentGradient
+                        )
+                        .frame(height: 300)
+                        .padding(.horizontal)
                     }
                     
                     // Style Picker
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("Card Style")
+                        Text("Background Style")
                             .font(.headline)
                             .padding(.horizontal)
                         
-                        CardStylePicker(selectedStyle: $selectedStyle)
-                            .onChange(of: selectedStyle) { _ in
-                                generatedImage = nil // Reset preview when style changes
+                        CardStylePicker(
+                            selectedStyle: $selectedStyle,
+                            selectedPhoto: $selectedPhoto,
+                            currentGradient: $currentGradient,
+                            onRandomGradient: {
+                                currentGradient = shareGenerator.generateRandomGradient()
                             }
+                        )
                     }
                     
-                    // Actions
+                    // Main Actions
                     VStack(spacing: 12) {
-                        // Generate Card Button
+                        // Share as Image Button
                         Button(action: {
                             Task {
-                                await generateCard()
+                                await shareAsImage()
                             }
                         }) {
                             HStack {
@@ -68,7 +68,7 @@ struct ShareOptionsSheet: View {
                                         .progressViewStyle(CircularProgressViewStyle(tint: .white))
                                 } else {
                                     Image(systemName: "photo")
-                                    Text("Generate Card")
+                                    Text("Share as Image")
                                 }
                             }
                             .frame(maxWidth: .infinity)
@@ -77,15 +77,15 @@ struct ShareOptionsSheet: View {
                             .foregroundColor(.white)
                             .cornerRadius(12)
                         }
-                        .disabled(isGenerating)
+                        .disabled(isGenerating || (selectedStyle == .photo && selectedPhoto == nil))
                         .padding(.horizontal)
                         
-                        // Share Text Button
+                        // Share as Text Button
                         Button(action: {
                             shareText()
                         }) {
                             HStack {
-                                Image(systemName: "square.and.arrow.up")
+                                Image(systemName: "text.quote")
                                 Text("Share as Text")
                             }
                             .frame(maxWidth: .infinity)
@@ -94,40 +94,7 @@ struct ShareOptionsSheet: View {
                             .foregroundColor(.white)
                             .cornerRadius(12)
                         }
-                        .padding(.horizontal)
-                        
-                        // Save to Photos Button
-                        if generatedImage != nil {
-                            Button(action: {
-                                Task {
-                                    await saveToPhotos()
-                                }
-                            }) {
-                                HStack {
-                                    Image(systemName: "square.and.arrow.down")
-                                    Text("Save to Photos")
-                                }
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.purple)
-                                .foregroundColor(.white)
-                                .cornerRadius(12)
-                            }
-                            .padding(.horizontal)
-                        }
-                    }
-                    
-                    // Success Message
-                    if showSaveSuccess {
-                        HStack {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.green)
-                            Text("Saved to Photos!")
-                                .font(.subheadline)
-                        }
-                        .padding()
-                        .background(Color.green.opacity(0.1))
-                        .cornerRadius(8)
+                        .disabled(isGenerating)
                         .padding(.horizontal)
                     }
                     
@@ -154,16 +121,32 @@ struct ShareOptionsSheet: View {
                 }
             }
         }
+        .onAppear {
+            // Initialize gradient based on quote category
+            currentGradient = getDefaultGradient()
+        }
     }
     
-    private func generateCard() async {
+    private func shareAsImage() async {
         isGenerating = true
         errorMessage = nil
         
-        let image = await shareGenerator.generateQuoteCard(quote: quote, style: selectedStyle)
-        generatedImage = image
+        let image = await shareGenerator.generateQuoteCard(
+            quote: quote,
+            style: selectedStyle,
+            customPhoto: selectedPhoto,
+            gradientColors: selectedStyle == .gradient ? currentGradient : nil
+        )
         
         isGenerating = false
+        
+        // Share the image
+        let activityVC = UIActivityViewController(activityItems: [image], applicationActivities: nil)
+        
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let rootVC = windowScene.windows.first?.rootViewController {
+            rootVC.present(activityVC, animated: true)
+        }
     }
     
     private func shareText() {
@@ -176,21 +159,18 @@ struct ShareOptionsSheet: View {
         }
     }
     
-    private func saveToPhotos() async {
-        guard let image = generatedImage else { return }
-        
-        errorMessage = nil
-        showSaveSuccess = false
-        
-        do {
-            try await shareGenerator.saveToPhotoLibrary(image: image)
-            showSaveSuccess = true
-            
-            // Hide success message after 2 seconds
-            try? await Task.sleep(nanoseconds: 2_000_000_000)
-            showSaveSuccess = false
-        } catch {
-            errorMessage = error.localizedDescription
+    private func getDefaultGradient() -> [Color] {
+        switch quote.category {
+        case .motivation:
+            return [Color.orange, Color.pink]
+        case .love:
+            return [Color.pink, Color.purple]
+        case .success:
+            return [Color.green, Color.blue]
+        case .wisdom:
+            return [Color.purple, Color.blue]
+        case .humor:
+            return [Color.blue, Color.cyan]
         }
     }
 }

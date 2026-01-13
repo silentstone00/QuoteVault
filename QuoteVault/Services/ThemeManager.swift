@@ -88,7 +88,7 @@ protocol ThemeManagerProtocol {
 class ThemeManager: ThemeManagerProtocol, ObservableObject {
     // MARK: - Published Properties
     
-    @Published private var theme: AppTheme
+    @Published private(set) var theme: AppTheme
     
     // MARK: - Private Properties
     
@@ -156,16 +156,19 @@ class ThemeManager: ThemeManagerProtocol, ObservableObject {
             theme.colorScheme = nil
         }
         saveTheme()
+        objectWillChange.send()
     }
     
     func setAccentColor(_ color: AccentColorOption) {
         theme.accentColor = color
         saveTheme()
+        objectWillChange.send()
     }
     
     func setFontSize(_ size: FontSizeOption) {
         theme.fontSize = size
         saveTheme()
+        objectWillChange.send()
     }
     
     func syncToCloud() async throws {

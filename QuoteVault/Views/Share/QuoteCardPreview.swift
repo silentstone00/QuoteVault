@@ -10,11 +10,18 @@ import SwiftUI
 struct QuoteCardPreview: View {
     let quote: Quote
     let style: CardStyle
+    let customPhoto: UIImage?
+    let gradientColors: [Color]
     
     var body: some View {
         ZStack {
             // Background
             backgroundView
+            
+            // Content with semi-transparent overlay for photo background
+            if style == .photo {
+                Color.black.opacity(0.4)
+            }
             
             // Content
             VStack(spacing: 16) {
@@ -57,38 +64,35 @@ struct QuoteCardPreview: View {
         switch style {
         case .minimal:
             Color.white
-        case .gradient:
-            LinearGradient(
-                colors: gradientColors,
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
         case .dark:
             LinearGradient(
                 colors: [Color(hex: "1a1a2e"), Color(hex: "16213e")],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
+        case .gradient:
+            LinearGradient(
+                colors: gradientColors,
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        case .photo:
+            if let photo = customPhoto {
+                GeometryReader { geometry in
+                    Image(uiImage: photo)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                        .clipped()
+                }
+            } else {
+                Color.gray
+            }
         }
     }
     
     private var textColor: Color {
         style == .minimal ? .black : .white
-    }
-    
-    private var gradientColors: [Color] {
-        switch quote.category {
-        case .motivation:
-            return [Color.orange, Color.pink]
-        case .love:
-            return [Color.pink, Color.purple]
-        case .success:
-            return [Color.green, Color.blue]
-        case .wisdom:
-            return [Color.purple, Color.blue]
-        case .humor:
-            return [Color.blue, Color.cyan]
-        }
     }
 }
 
@@ -101,7 +105,9 @@ struct QuoteCardPreview: View {
             category: .motivation,
             createdAt: Date()
         ),
-        style: .gradient
+        style: .gradient,
+        customPhoto: nil,
+        gradientColors: [Color.orange, Color.pink]
     )
     .frame(height: 300)
     .padding()

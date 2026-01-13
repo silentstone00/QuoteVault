@@ -107,7 +107,12 @@ class QuoteListViewModel: ObservableObject {
                 category: selectedCategory
             )
             
-            quotes.append(contentsOf: fetchedQuotes)
+            // Filter out duplicates before appending
+            let newQuotes = fetchedQuotes.filter { newQuote in
+                !quotes.contains(where: { $0.id == newQuote.id })
+            }
+            
+            quotes.append(contentsOf: newQuotes)
             hasMorePages = fetchedQuotes.count == pageSize
             
         } catch {
