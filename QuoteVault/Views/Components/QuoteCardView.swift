@@ -9,13 +9,19 @@ import SwiftUI
 
 struct QuoteCardView: View {
     let quote: Quote
-    @State private var isFavorited = false
+    @StateObject private var collectionViewModel = CollectionViewModel()
+    @EnvironmentObject var themeManager: ThemeManager
+    @State private var showShareSheet = false
+    
+    var isFavorited: Bool {
+        collectionViewModel.isFavorite(quoteId: quote.id)
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             // Quote Text
             Text(quote.text)
-                .font(.body)
+                .font(.system(size: themeManager.quoteFontSize))
                 .foregroundColor(.primary)
                 .lineLimit(nil)
             
@@ -34,8 +40,9 @@ struct QuoteCardView: View {
             HStack(spacing: 16) {
                 // Favorite Button
                 Button(action: {
-                    isFavorited.toggle()
-                    // TODO: Connect to CollectionManager
+                    Task {
+                        await collectionViewModel.toggleFavorite(quote: quote)
+                    }
                 }) {
                     HStack(spacing: 4) {
                         Image(systemName: isFavorited ? "heart.fill" : "heart")
@@ -49,7 +56,7 @@ struct QuoteCardView: View {
                 
                 // Share Button
                 Button(action: {
-                    // TODO: Connect to ShareGenerator
+                    showShareSheet = true
                 }) {
                     HStack(spacing: 4) {
                         Image(systemName: "square.and.arrow.up")
@@ -65,6 +72,9 @@ struct QuoteCardView: View {
         .background(Color(.systemBackground))
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.05), radius: 3, x: 0, y: 1)
+        .sheet(isPresented: $showShareSheet) {
+            ShareOptionsSheet(quote: quote)
+        }
     }
 }
 
