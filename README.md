@@ -215,8 +215,7 @@ Requirements → Design → Implementation → Testing → Refinement
 
 *Add your design links here:*
 
-- Figma: `[Your Figma Link]`
-- Stitch: `[Your Stitch Link]`
+- Stitch: `[https://stitch.withgoogle.com/projects/15777458321314676667]`
 
 ### Design System
 
@@ -296,14 +295,4 @@ Test coverage includes:
 - Collection manager tests
 - Theme manager tests
 
----
 
-## License
-
-This project is for educational purposes.
-
----
-
-## Author
-
-Built with ❤️ using SwiftUI and AI assistance.
