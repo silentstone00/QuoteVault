@@ -73,9 +73,10 @@ struct CollectionCard: View {
     @ObservedObject private var viewModel = CollectionViewModel.shared
     @EnvironmentObject var themeManager: ThemeManager
     @State private var quoteCount: Int = 0
+    @State private var loadTask: Task<Void, Never>?
     
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 8) {
             // Folder icon
             Image(systemName: "folder.fill")
                 .font(.system(size: 40))
@@ -89,9 +90,7 @@ struct CollectionCard: View {
                 .lineLimit(2)
                 .fixedSize(horizontal: false, vertical: true)
             
-            Spacer()
-            
-            // Quote count at bottom
+            // Quote count
             HStack(spacing: 6) {
                 Image(systemName: "quote.bubble")
                     .font(.caption)
@@ -101,15 +100,31 @@ struct CollectionCard: View {
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
+            .padding(.top, 4)
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.vertical, 20)
         .padding(.horizontal, 14)
         .background(Color.customCard)
         .cornerRadius(16)
         .aspectRatio(0.95, contentMode: .fit)
-        .task {
-            quoteCount = await viewModel.getQuoteCount(for: collection.id)
+        .onAppear {
+            loadQuoteCount()
+        }
+        .onDisappear {
+            loadTask?.cancel()
+        }
+    }
+    
+    private func loadQuoteCount() {
+        loadTask?.cancel()
+        loadTask = Task {
+            let count = await viewModel.getQuoteCount(for: collection.id)
+            if !Task.isCancelled {
+                await MainActor.run {
+                    quoteCount = count
+                }
+            }
         }
     }
 }

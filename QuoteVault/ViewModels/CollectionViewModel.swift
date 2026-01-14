@@ -134,6 +134,9 @@ class CollectionViewModel: ObservableObject {
         
         do {
             selectedCollectionQuotes = try await collectionManager.getQuotesInCollection(collectionId: collectionId)
+        } catch is CancellationError {
+            // Ignore cancellation errors - happens when view disappears
+            print("Load collection quotes cancelled")
         } catch {
             errorMessage = "Failed to load collection quotes: \(error.localizedDescription)"
         }

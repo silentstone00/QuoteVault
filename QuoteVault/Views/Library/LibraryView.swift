@@ -9,6 +9,7 @@ import SwiftUI
 
 struct LibraryView: View {
     @State private var selectedSegment = 0
+    @State private var isFavoritesSelectionMode = false
     @ObservedObject private var collectionViewModel = CollectionViewModel.shared
     @EnvironmentObject var themeManager: ThemeManager
     
@@ -66,7 +67,7 @@ struct LibraryView: View {
                     
                     // Content
                     TabView(selection: $selectedSegment) {
-                        FavoritesView()
+                        FavoritesView(isSelectionMode: $isFavoritesSelectionMode)
                             .tag(0)
                         
                         CollectionsListView()
@@ -79,8 +80,16 @@ struct LibraryView: View {
             .navigationBarTitleDisplayMode(.large)
             .toolbarBackground(Color.customBackground, for: .navigationBar)
             .toolbar {
-                if selectedSegment == 1 {
-                    ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    if selectedSegment == 0 {
+                        // Favorites: Show Select button
+                        Button(isFavoritesSelectionMode ? "Done" : "Select") {
+                            withAnimation {
+                                isFavoritesSelectionMode.toggle()
+                            }
+                        }
+                    } else {
+                        // Collections: Show Plus button
                         Button(action: {
                             collectionViewModel.showCreateCollection = true
                         }) {

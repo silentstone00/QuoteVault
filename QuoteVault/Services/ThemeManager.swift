@@ -32,6 +32,16 @@ enum AccentColorOption: String, CaseIterable, Codable {
     }
 }
 
+/// Widget theme options
+enum WidgetThemeOption: String, CaseIterable, Codable {
+    case light
+    case dark
+    
+    var displayName: String {
+        rawValue.capitalized
+    }
+}
+
 /// Font size options
 enum FontSizeOption: String, CaseIterable, Codable {
     case small
