@@ -215,7 +215,7 @@ Requirements → Design → Implementation → Testing → Refinement
 
 *Add your design links here:*
 
-- Stitch: `[https://stitch.withgoogle.com/projects/15777458321314676667]`
+- **Stitch Design**: [Open project ↗](https://stitch.withgoogle.com/projects/15777458321314676667)
 
 ### Design System
 
