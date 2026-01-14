@@ -60,6 +60,9 @@ struct QuoteVaultApp: App {
                 }
             }
             .onAppear {
+                // Clear badge on app launch
+                UIApplication.shared.applicationIconBadgeNumber = 0
+                
                 // Restore session on app launch
                 Task {
                     await authViewModel.restoreSession()
@@ -111,8 +114,8 @@ class NotificationDelegate: NSObject, ObservableObject, UNUserNotificationCenter
         willPresent notification: UNNotification,
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
     ) {
-        // Show notification even when app is in foreground
-        completionHandler([.banner, .sound, .badge])
+        // Show notification even when app is in foreground (without badge)
+        completionHandler([.banner, .sound])
     }
     
     // Handle notification tap

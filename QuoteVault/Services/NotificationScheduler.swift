@@ -76,7 +76,6 @@ class NotificationScheduler: NotificationSchedulerProtocol {
         content.title = "Quote of the Day"
         content.body = "\"\(quote.text)\" — \(quote.author)"
         content.sound = .default
-        content.badge = 1
         
         // Add quote ID to userInfo for deep linking
         content.userInfo = ["quoteId": quote.id.uuidString]
@@ -108,11 +107,6 @@ class NotificationScheduler: NotificationSchedulerProtocol {
         notificationCenter.removeDeliveredNotifications(
             withIdentifiers: [notificationIdentifier]
         )
-        
-        // Reset badge count
-        await MainActor.run {
-            UIApplication.shared.applicationIconBadgeNumber = 0
-        }
     }
     
     func updateNotificationTime(_ time: DateComponents) async throws {
@@ -132,7 +126,6 @@ class NotificationScheduler: NotificationSchedulerProtocol {
             newContent.title = content.title
             newContent.body = content.body
             newContent.sound = content.sound
-            newContent.badge = content.badge
             newContent.userInfo = content.userInfo
             
             // Create new trigger with updated time
