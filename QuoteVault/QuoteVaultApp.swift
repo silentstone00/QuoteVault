@@ -26,7 +26,7 @@ struct QuoteVaultApp: App {
                 if authViewModel.isLoading {
                     // Show loading during session restoration
                     ZStack {
-                        Color(.systemBackground)
+                        Color.customBackground
                             .ignoresSafeArea()
                         
                         VStack(spacing: 16) {

@@ -16,15 +16,16 @@ struct HomeView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                // Background
-                Color(.systemGroupedBackground)
+                Color.customBackground
                     .ignoresSafeArea()
                 
                 ScrollView {
                     VStack(spacing: 16) {
                         // Quote of the Day Card
                         if let qotd = viewModel.quoteOfTheDay {
-                            QuoteOfTheDayCard(quote: qotd)
+                            QuoteOfTheDayCard(quote: qotd, onToast: { message in
+                                showToastMessage(message)
+                            })
                                 .environmentObject(themeManager)
                                 .padding(.horizontal)
                                 .padding(.top, 8)
@@ -130,6 +131,7 @@ struct HomeView: View {
 
 struct QuoteOfTheDayCard: View {
     let quote: Quote
+    let onToast: ((String) -> Void)?
     @ObservedObject private var collectionViewModel = CollectionViewModel.shared
     @EnvironmentObject var themeManager: ThemeManager
     @State private var showShareSheet = false
@@ -210,8 +212,55 @@ struct QuoteOfTheDayCard: View {
         }
         .background(themeManager.accentColor)
         .cornerRadius(16)
+        .contextMenu {
+            if !collectionViewModel.collections.isEmpty {
+                Section {
+                    ForEach(collectionViewModel.collections) { collection in
+                        Button(action: {
+                            addToCollection(collection)
+                        }) {
+                            Label(collection.name, systemImage: "folder")
+                        }
+                    }
+                }
+                
+                Section {
+                    Button(action: {
+                        copyToClipboard()
+                    }) {
+                        Label("Copy", systemImage: "doc.on.doc")
+                    }
+                    
+                    Button(action: {
+                        showShareSheet = true
+                    }) {
+                        Label("Share", systemImage: "square.and.arrow.up")
+                    }
+                }
+            }
+        }
         .sheet(isPresented: $showShareSheet) {
             ShareOptionsSheet(quote: quote)
+        }
+        .onAppear {
+            Task {
+                await collectionViewModel.syncFromCloud()
+            }
+        }
+    }
+    
+    private func addToCollection(_ collection: QuoteCollection) {
+        Task {
+            await collectionViewModel.addToCollection(quoteId: quote.id, collectionId: collection.id)
+            
+            // Haptic feedback
+            let generator = UIImpactFeedbackGenerator(style: .light)
+            generator.impactOccurred()
+            
+            // Show toast
+            await MainActor.run {
+                onToast?("Added to \(collection.name)")
+            }
         }
     }
     

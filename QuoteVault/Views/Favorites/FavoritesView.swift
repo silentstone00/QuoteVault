@@ -15,7 +15,7 @@ struct FavoritesView: View {
     
     var body: some View {
         ZStack {
-            Color(.systemGroupedBackground)
+            Color.customBackground
                 .ignoresSafeArea()
             
             if viewModel.favorites.isEmpty {

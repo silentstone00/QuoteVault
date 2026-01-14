@@ -7,6 +7,7 @@
 
 import Foundation
 import Supabase
+import Auth
 
 /// Configuration and initialization for Supabase client
 class SupabaseConfig {
@@ -26,7 +27,12 @@ class SupabaseConfig {
         
         return SupabaseClient(
             supabaseURL: url,
-            supabaseKey: supabaseAnonKey
+            supabaseKey: supabaseAnonKey,
+            options: .init(
+                auth: .init(
+                    emitLocalSessionAsInitialSession: true
+                )
+            )
         )
     }()
     

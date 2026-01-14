@@ -64,17 +64,48 @@ struct QuoteCardView: View {
             .padding(.horizontal, 24)
             .padding(.vertical, 16)
         }
-        .background(Color(.secondarySystemGroupedBackground))
+        .background(Color.customCard)
         .cornerRadius(12)
         .overlay(
             RoundedRectangle(cornerRadius: 12)
                 .stroke(isFavorited ? Color.pink : Color.clear, lineWidth: 2)
         )
+        .contextMenu {
+            if !collectionViewModel.collections.isEmpty {
+                ForEach(collectionViewModel.collections) { collection in
+                    Button(action: {
+                        addToCollection(collection)
+                    }) {
+                        Label(collection.name, systemImage: "folder")
+                    }
+                }
+            }
+        }
         .onTapGesture(count: 2) {
             handleDoubleTap()
         }
         .sheet(isPresented: $showShareSheet) {
             ShareOptionsSheet(quote: quote)
+        }
+        .onAppear {
+            Task {
+                await collectionViewModel.syncFromCloud()
+            }
+        }
+    }
+    
+    private func addToCollection(_ collection: QuoteCollection) {
+        Task {
+            await collectionViewModel.addToCollection(quoteId: quote.id, collectionId: collection.id)
+            
+            // Haptic feedback
+            let generator = UIImpactFeedbackGenerator(style: .light)
+            generator.impactOccurred()
+            
+            // Show toast
+            await MainActor.run {
+                onFavoriteToggle?("Added to \(collection.name)")
+            }
         }
     }
     

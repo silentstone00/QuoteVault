@@ -13,27 +13,32 @@ struct CollectionsListView: View {
     
     var body: some View {
         ZStack {
-            Color(.systemGroupedBackground)
+            Color.customBackground
                 .ignoresSafeArea()
             
             if viewModel.collections.isEmpty {
                 EmptyStateView(
                     icon: "folder",
                     title: "No Collections Yet",
-                    message: "Create a collection to organize your favorite quotes"
+                    message: "Hold any quote to add it to your collection"
                 )
             } else {
                 ScrollView {
-                    LazyVStack(spacing: 12) {
+                    LazyVGrid(columns: [
+                        GridItem(.flexible(), spacing: 10),
+                        GridItem(.flexible(), spacing: 10)
+                    ], spacing: 10) {
                         ForEach(viewModel.collections) { collection in
                             NavigationLink(destination: CollectionDetailView(collection: collection)
                                 .environmentObject(themeManager)) {
                                 CollectionCard(collection: collection)
+                                    .environmentObject(themeManager)
                             }
                             .buttonStyle(PlainButtonStyle())
                         }
                     }
-                    .padding()
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 16)
                 }
                 .refreshable {
                     await viewModel.syncFromCloud()
@@ -66,39 +71,43 @@ struct CollectionsListView: View {
 struct CollectionCard: View {
     let collection: QuoteCollection
     @ObservedObject private var viewModel = CollectionViewModel.shared
+    @EnvironmentObject var themeManager: ThemeManager
     @State private var quoteCount: Int = 0
     
     var body: some View {
-        HStack {
-            // Icon
+        VStack(spacing: 12) {
+            // Folder icon
             Image(systemName: "folder.fill")
-                .font(.title2)
-                .foregroundColor(.blue)
-                .frame(width: 50, height: 50)
-                .background(Color.blue.opacity(0.1))
-                .cornerRadius(10)
+                .font(.system(size: 40))
+                .foregroundColor(themeManager.accentColor)
             
-            // Collection Info
-            VStack(alignment: .leading, spacing: 4) {
-                Text(collection.name)
-                    .font(.headline)
-                    .foregroundColor(.primary)
+            // Collection name
+            Text(collection.name)
+                .font(.headline)
+                .foregroundColor(.primary)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+            
+            Spacer()
+            
+            // Quote count at bottom
+            HStack(spacing: 6) {
+                Image(systemName: "quote.bubble")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
                 
                 Text("\(quoteCount) quotes")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
-            
-            Spacer()
-            
-            // Chevron
-            Image(systemName: "chevron.right")
-                .foregroundColor(.gray)
         }
-        .padding()
-        .background(Color(.secondarySystemGroupedBackground))
-        .cornerRadius(12)
-        .shadow(color: .black.opacity(0.05), radius: 3, x: 0, y: 1)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 20)
+        .padding(.horizontal, 14)
+        .background(Color.customCard)
+        .cornerRadius(16)
+        .aspectRatio(0.95, contentMode: .fit)
         .task {
             quoteCount = await viewModel.getQuoteCount(for: collection.id)
         }

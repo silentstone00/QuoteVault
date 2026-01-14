@@ -35,7 +35,6 @@ class SharedQuoteStorage {
             
             defaults.set(data, forKey: qotdKey)
             defaults.set(Date(), forKey: qotdDateKey)
-            defaults.synchronize()
             
             print("Saved QOTD to shared storage: \(quote.text)")
         } catch {

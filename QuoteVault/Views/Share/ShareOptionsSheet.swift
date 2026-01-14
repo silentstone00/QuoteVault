@@ -57,7 +57,7 @@ struct ShareOptionsSheet: View {
                     }
                     
                     // Main Actions
-                    VStack(spacing: 12) {
+                    HStack(spacing: 12) {
                         // Share as Image Button
                         Button(action: {
                             Task {
@@ -71,6 +71,7 @@ struct ShareOptionsSheet: View {
                                 } else {
                                     Image(systemName: "photo")
                                     Text("Share as Image")
+                                        .font(.subheadline)
                                 }
                             }
                             .frame(maxWidth: .infinity)
@@ -80,7 +81,6 @@ struct ShareOptionsSheet: View {
                             .cornerRadius(12)
                         }
                         .disabled(isGenerating || (selectedStyle == .photo && selectedPhoto == nil))
-                        .padding(.horizontal)
                         
                         // Share as Text Button
                         Button(action: {
@@ -89,6 +89,7 @@ struct ShareOptionsSheet: View {
                             HStack {
                                 Image(systemName: "text.quote")
                                 Text("Share as Text")
+                                    .font(.subheadline)
                             }
                             .frame(maxWidth: .infinity)
                             .padding()
@@ -97,8 +98,8 @@ struct ShareOptionsSheet: View {
                             .cornerRadius(12)
                         }
                         .disabled(isGenerating)
-                        .padding(.horizontal)
                     }
+                    .padding(.horizontal)
                     
                     // Error Message
                     if let error = errorMessage {

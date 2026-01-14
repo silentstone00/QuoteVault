@@ -72,11 +72,11 @@ class AuthService: AuthServiceProtocol {
     
     // MARK: - Initialization
     
-    init(supabase: SupabaseClient = SupabaseConfig.shared) {
+    nonisolated init(supabase: SupabaseClient = SupabaseConfig.shared) {
         self.supabase = supabase
         
         // Listen for auth state changes
-        Task {
+        Task { @MainActor in
             await setupAuthStateListener()
         }
     }

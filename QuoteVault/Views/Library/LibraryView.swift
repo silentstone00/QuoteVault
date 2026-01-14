@@ -14,27 +14,70 @@ struct LibraryView: View {
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 0) {
-                // Segmented Control
-                Picker("Library Section", selection: $selectedSegment) {
-                    Text("Favorites").tag(0)
-                    Text("Collections").tag(1)
-                }
-                .pickerStyle(.segmented)
-                .padding()
+            ZStack {
+                // Background
+                Color.customBackground
+                    .ignoresSafeArea()
                 
-                // Content
-                TabView(selection: $selectedSegment) {
-                    FavoritesView()
-                        .tag(0)
+                VStack(spacing: 0) {
+                    // Custom Pill Toggle
+                    HStack(spacing: 0) {
+                        // Favorites Button
+                        Button(action: {
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                selectedSegment = 0
+                            }
+                        }) {
+                            Text("Favorites")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(selectedSegment == 0 ? .white : .primary)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 10)
+                                .background(
+                                    selectedSegment == 0 ? themeManager.accentColor : Color.clear
+                                )
+                                .cornerRadius(20)
+                        }
+                        
+                        // Collections Button
+                        Button(action: {
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                selectedSegment = 1
+                            }
+                        }) {
+                            Text("Collections")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(selectedSegment == 1 ? .white : .primary)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 10)
+                                .background(
+                                    selectedSegment == 1 ? themeManager.accentColor : Color.clear
+                                )
+                                .cornerRadius(20)
+                        }
+                    }
+                    .padding(4)
+                    .background(Color.customCard)
+                    .cornerRadius(24)
+                    .padding(.horizontal)
+                    .padding(.vertical, 12)
                     
-                    CollectionsListView()
-                        .tag(1)
+                    // Content
+                    TabView(selection: $selectedSegment) {
+                        FavoritesView()
+                            .tag(0)
+                        
+                        CollectionsListView()
+                            .tag(1)
+                    }
+                    .tabViewStyle(.page(indexDisplayMode: .never))
                 }
-                .tabViewStyle(.page(indexDisplayMode: .never))
             }
             .navigationTitle("Library")
             .navigationBarTitleDisplayMode(.large)
+            .toolbarBackground(Color.customBackground, for: .navigationBar)
             .toolbar {
                 if selectedSegment == 1 {
                     ToolbarItem(placement: .navigationBarTrailing) {
@@ -54,6 +97,7 @@ struct LibraryView: View {
                 }
             }
         }
+        .navigationViewStyle(.stack)
     }
 }
 

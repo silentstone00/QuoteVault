@@ -25,432 +25,26 @@ struct ProfileView: View {
     
     var body: some View {
         NavigationView {
-            ZStack {
-                Color(.systemGroupedBackground)
-                    .ignoresSafeArea()
-                
-                ScrollView {
-                    VStack(spacing: 24) {
-                        // Avatar Section
-                        VStack(spacing: 16) {
-                            if let avatarUrl = viewModel.currentUser?.avatarUrl,
-                               let url = URL(string: avatarUrl) {
-                                AsyncImage(url: url) { image in
-                                    image
-                                        .resizable()
-                                        .scaledToFill()
-                                } placeholder: {
-                                    Image(systemName: "person.circle.fill")
-                                        .resizable()
-                                        .foregroundColor(.gray)
-                                }
-                                .frame(width: 120, height: 120)
-                                .clipShape(Circle())
-                            } else {
-                                Image(systemName: "person.circle.fill")
-                                    .resizable()
-                                    .foregroundColor(.gray)
-                                    .frame(width: 120, height: 120)
-                            }
-                            
-                            if isEditing {
-                                PhotosPicker(selection: $selectedPhoto, matching: .images) {
-                                    Text("Change Photo")
-                                        .font(.subheadline)
-                                        .foregroundColor(.blue)
-                                }
-                                .onChange(of: selectedPhoto) { newValue in
-                                    Task {
-                                        if let data = try? await newValue?.loadTransferable(type: Data.self) {
-                                            await viewModel.updateProfile(name: nil, avatarData: data)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        .padding(.top, 20)
-                        
-                        // Profile Info
-                        VStack(spacing: 16) {
-                            // Display Name
-                            if isEditing {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Text("Display Name")
-                                        .font(.subheadline)
-                                        .foregroundColor(.secondary)
-                                    
-                                    TextField("Name", text: $editedName)
-                                        .textFieldStyle(.roundedBorder)
-                                        .padding(.horizontal)
-                                }
-                            } else {
-                                VStack(spacing: 4) {
-                                    Text(viewModel.currentUser?.displayName ?? "User")
-                                        .font(.title2)
-                                        .fontWeight(.semibold)
-                                    
-                                    Text(viewModel.currentUser?.email ?? "")
-                                        .font(.subheadline)
-                                        .foregroundColor(.secondary)
-                                }
-                            }
-                            
-                            // Edit/Save Button
-                            if isEditing {
-                                HStack(spacing: 12) {
-                                    Button("Cancel") {
-                                        isEditing = false
-                                        editedName = viewModel.currentUser?.displayName ?? ""
-                                    }
-                                    .buttonStyle(.bordered)
-                                    
-                                    Button("Save") {
-                                        Task {
-                                            await viewModel.updateProfile(
-                                                name: editedName,
-                                                avatarData: nil
-                                            )
-                                            isEditing = false
-                                        }
-                                    }
-                                    .buttonStyle(.borderedProminent)
-                                    .disabled(editedName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                                }
-                            } else {
-                                Button("Edit Profile") {
-                                    editedName = viewModel.currentUser?.displayName ?? ""
-                                    isEditing = true
-                                }
-                                .buttonStyle(.bordered)
-                            }
-                        }
-                        .padding()
-                        .background(Color(.systemBackground))
-                        .cornerRadius(12)
-                        .padding(.horizontal)
-                        
-                        // Account Section
-                        VStack(spacing: 0) {
-                            ProfileMenuItem(
-                                icon: "envelope",
-                                title: "Email",
-                                value: viewModel.currentUser?.email ?? "",
-                                showChevron: false
-                            )
-                            
-                            Divider()
-                                .padding(.leading, 52)
-                            
-                            ProfileMenuItem(
-                                icon: "calendar",
-                                title: "Member Since",
-                                value: formatDate(viewModel.currentUser?.createdAt),
-                                showChevron: false
-                            )
-                        }
-                        .background(Color(.systemBackground))
-                        .cornerRadius(12)
-                        .padding(.horizontal)
-                        
-                        // Settings Section - Appearance
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("Appearance")
-                                .font(.headline)
-                                .padding(.horizontal)
-                            
-                            VStack(spacing: 0) {
-                                // Color Scheme
-                                HStack {
-                                    Image(systemName: "circle.lefthalf.filled")
-                                        .font(.title3)
-                                        .foregroundColor(.blue)
-                                        .frame(width: 28)
-                                    
-                                    Text("Theme")
-                                        .font(.body)
-                                    
-                                    Spacer()
-                                    
-                                    Picker("", selection: $colorScheme) {
-                                        Text("System").tag(nil as ColorScheme?)
-                                        Text("Light").tag(ColorScheme.light as ColorScheme?)
-                                        Text("Dark").tag(ColorScheme.dark as ColorScheme?)
-                                    }
-                                    .pickerStyle(.menu)
-                                    .onChange(of: colorScheme) { newValue in
-                                        themeManager.setColorScheme(newValue)
-                                    }
-                                }
-                                .padding()
-                                
-                                Divider()
-                                    .padding(.leading, 52)
-                                
-                                // Accent Color
-                                VStack(alignment: .leading, spacing: 12) {
-                                    HStack {
-                                        Image(systemName: "paintpalette")
-                                            .font(.title3)
-                                            .foregroundColor(.blue)
-                                            .frame(width: 28)
-                                        
-                                        Text("Accent Color")
-                                            .font(.body)
-                                    }
-                                    
-                                    HStack(spacing: 16) {
-                                        ForEach(AccentColorOption.allCases, id: \.self) { option in
-                                            AccentColorSwatch(
-                                                color: option,
-                                                isSelected: accentColor == option
-                                            ) {
-                                                accentColor = option
-                                                themeManager.setAccentColor(option)
-                                            }
-                                        }
-                                    }
-                                    .padding(.leading, 44)
-                                }
-                                .padding()
-                            }
-                            .background(Color(.systemBackground))
-                            .cornerRadius(12)
-                        }
-                        .padding(.horizontal)
-                        
-                        // Settings Section - Typography
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("Typography")
-                                .font(.headline)
-                                .padding(.horizontal)
-                            
-                            VStack(spacing: 12) {
-                                HStack {
-                                    Image(systemName: "textformat.size")
-                                        .font(.title3)
-                                        .foregroundColor(.blue)
-                                        .frame(width: 28)
-                                    
-                                    Text("Font Size")
-                                        .font(.body)
-                                    
-                                    Spacer()
-                                    
-                                    Text(fontSize.displayName)
-                                        .font(.subheadline)
-                                        .foregroundColor(.secondary)
-                                }
-                                .padding(.horizontal)
-                                
-                                // Font Size Slider
-                                HStack(spacing: 12) {
-                                    Text("A")
-                                        .font(.caption)
-                                    
-                                    Slider(
-                                        value: Binding(
-                                            get: {
-                                                Double(FontSizeOption.allCases.firstIndex(of: fontSize) ?? 1)
-                                            },
-                                            set: { newValue in
-                                                let index = Int(newValue)
-                                                if index < FontSizeOption.allCases.count {
-                                                    fontSize = FontSizeOption.allCases[index]
-                                                    themeManager.setFontSize(fontSize)
-                                                }
-                                            }
-                                        ),
-                                        in: 0...Double(FontSizeOption.allCases.count - 1),
-                                        step: 1
-                                    )
-                                    .tint(themeManager.accentColor)
-                                    
-                                    Text("A")
-                                        .font(.title2)
-                                }
-                                .padding(.horizontal)
-                                
-                                // Preview Text
-                                Text("The only way to do great work is to love what you do.")
-                                    .font(.system(size: fontSize.fontSize))
-                                    .foregroundColor(.secondary)
-                                    .padding(.horizontal)
-                            }
-                            .padding(.vertical)
-                            .background(Color(.systemBackground))
-                            .cornerRadius(12)
-                        }
-                        .padding(.horizontal)
-                        
-                        // Settings Section - Notifications
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("Notifications")
-                                .font(.headline)
-                                .padding(.horizontal)
-                            
-                            VStack(spacing: 0) {
-                                HStack {
-                                    Image(systemName: "bell.fill")
-                                        .font(.title3)
-                                        .foregroundColor(.blue)
-                                        .frame(width: 28)
-                                    
-                                    Text("Daily Quote")
-                                        .font(.body)
-                                    
-                                    Spacer()
-                                    
-                                    Toggle("", isOn: Binding(
-                                        get: { notificationsEnabled },
-                                        set: { newValue in
-                                            Task {
-                                                await toggleNotifications(newValue)
-                                            }
-                                        }
-                                    ))
-                                    .tint(themeManager.accentColor)
-                                }
-                                .padding()
-                                
-                                if notificationsEnabled {
-                                    Divider()
-                                        .padding(.leading, 52)
-                                    
-                                    HStack {
-                                        Image(systemName: "clock")
-                                            .font(.title3)
-                                            .foregroundColor(.blue)
-                                            .frame(width: 28)
-                                        
-                                        DatePicker(
-                                            "Time",
-                                            selection: Binding(
-                                                get: { notificationTime },
-                                                set: { newValue in
-                                                    Task {
-                                                        await updateNotificationTime(newValue)
-                                                    }
-                                                }
-                                            ),
-                                            displayedComponents: .hourAndMinute
-                                        )
-                                        .tint(themeManager.accentColor)
-                                    }
-                                    .padding()
-                                }
-                            }
-                            .background(Color(.systemBackground))
-                            .cornerRadius(12)
-                        }
-                        .padding(.horizontal)
-                        
-                        // About Section
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("About")
-                                .font(.headline)
-                                .padding(.horizontal)
-                            
-                            VStack(spacing: 0) {
-                                HStack {
-                                    Image(systemName: "info.circle")
-                                        .font(.title3)
-                                        .foregroundColor(.blue)
-                                        .frame(width: 28)
-                                    
-                                    Text("Version")
-                                    
-                                    Spacer()
-                                    
-                                    Text("1.0.0")
-                                        .foregroundColor(.secondary)
-                                }
-                                .padding()
-                                
-                                Divider()
-                                    .padding(.leading, 52)
-                                
-                                Link(destination: URL(string: "https://example.com/privacy")!) {
-                                    HStack {
-                                        Image(systemName: "hand.raised")
-                                            .font(.title3)
-                                            .foregroundColor(.blue)
-                                            .frame(width: 28)
-                                        
-                                        Text("Privacy Policy")
-                                        
-                                        Spacer()
-                                        
-                                        Image(systemName: "arrow.up.right.square")
-                                            .foregroundColor(.secondary)
-                                    }
-                                    .padding()
-                                }
-                                
-                                Divider()
-                                    .padding(.leading, 52)
-                                
-                                Link(destination: URL(string: "https://example.com/terms")!) {
-                                    HStack {
-                                        Image(systemName: "doc.text")
-                                            .font(.title3)
-                                            .foregroundColor(.blue)
-                                            .frame(width: 28)
-                                        
-                                        Text("Terms of Service")
-                                        
-                                        Spacer()
-                                        
-                                        Image(systemName: "arrow.up.right.square")
-                                            .foregroundColor(.secondary)
-                                    }
-                                    .padding()
-                                }
-                            }
-                            .background(Color(.systemBackground))
-                            .cornerRadius(12)
-                        }
-                        .padding(.horizontal)
-                        
-                        // Logout Button
-                        Button(action: {
-                            showLogoutAlert = true
-                        }) {
-                            HStack {
-                                Image(systemName: "rectangle.portrait.and.arrow.right")
-                                Text("Log Out")
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.red.opacity(0.1))
-                            .foregroundColor(.red)
-                            .cornerRadius(12)
-                        }
-                        .padding(.horizontal)
-                        .padding(.top, 8)
-                        
-                        Spacer()
-                    }
-                }
-                
-                // Error Banner
-                if let error = viewModel.errorMessage {
-                    VStack {
-                        Spacer()
-                        ErrorBanner(message: error) {
-                            viewModel.clearError()
-                        }
-                        .padding()
-                    }
+            ScrollView {
+                VStack(spacing: 24) {
+                    profileHeader
+                    appearanceSection
+                    typographySection
+                    notificationsSection
+                    logoutButton
+                    Spacer()
                 }
             }
+            .background(Color.customBackground)
             .navigationTitle("Profile")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(Color.customBackground, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .overlay(errorBanner)
             .task {
-                // Load theme settings
                 colorScheme = themeManager.colorScheme
                 accentColor = themeManager.theme.accentColor
                 fontSize = themeManager.theme.fontSize
-                
-                // Load notification settings
                 await loadNotificationSettings()
             }
             .alert("Log Out", isPresented: $showLogoutAlert) {
@@ -465,6 +59,407 @@ struct ProfileView: View {
             }
         }
     }
+    
+    // MARK: - View Components
+    
+    private var profileHeader: some View {
+        VStack(spacing: 20) {
+            avatarView
+            
+            if isEditing {
+                photoPickerButton
+            }
+            
+            if isEditing {
+                nameEditField
+            } else {
+                userInfoDisplay
+            }
+            
+            editSaveButtons
+        }
+        .padding(.vertical, 24)
+        .frame(maxWidth: .infinity)
+        .background(Color.customCard)
+        .cornerRadius(16)
+        .padding(.horizontal)
+        .padding(.top, 8)
+    }
+    
+    private var avatarView: some View {
+        Group {
+            if let avatarUrl = viewModel.currentUser?.avatarUrl,
+               let url = URL(string: avatarUrl) {
+                AsyncImage(url: url) { image in
+                    image
+                        .resizable()
+                        .scaledToFill()
+                } placeholder: {
+                    Image(systemName: "person.circle.fill")
+                        .resizable()
+                        .foregroundColor(.gray)
+                }
+                .frame(width: 120, height: 120)
+                .clipShape(Circle())
+            } else {
+                Image(systemName: "person.circle.fill")
+                    .resizable()
+                    .foregroundColor(.gray)
+                    .frame(width: 120, height: 120)
+            }
+        }
+    }
+    
+    private var photoPickerButton: some View {
+        PhotosPicker(selection: $selectedPhoto, matching: .images) {
+            Text("Change Photo")
+                .font(.subheadline)
+                .foregroundColor(themeManager.accentColor)
+        }
+        .onChange(of: selectedPhoto) { newValue in
+            Task {
+                if let data = try? await newValue?.loadTransferable(type: Data.self) {
+                    await viewModel.updateProfile(name: nil, avatarData: data)
+                }
+            }
+        }
+    }
+    
+    private var nameEditField: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Display Name")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+            
+            TextField("Name", text: $editedName)
+                .textFieldStyle(.roundedBorder)
+        }
+        .padding(.horizontal)
+    }
+    
+    private var userInfoDisplay: some View {
+        VStack(spacing: 8) {
+            Text(viewModel.currentUser?.displayName ?? "User")
+                .font(.title2)
+                .fontWeight(.semibold)
+            
+            Text(viewModel.currentUser?.email ?? "")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+            
+            memberSinceBadge
+        }
+    }
+    
+    private var memberSinceBadge: some View {
+        HStack(spacing: 4) {
+            Image(systemName: "calendar")
+                .font(.caption)
+            Text("Member since \(formatDate(viewModel.currentUser?.createdAt))")
+                .font(.caption)
+        }
+        .foregroundColor(.secondary)
+        .padding(.top, 4)
+    }
+    
+    private var editSaveButtons: some View {
+        Group {
+            if isEditing {
+                HStack(spacing: 12) {
+                    Button("Cancel") {
+                        isEditing = false
+                        editedName = viewModel.currentUser?.displayName ?? ""
+                    }
+                    .buttonStyle(.bordered)
+                    
+                    Button("Save") {
+                        Task {
+                            await viewModel.updateProfile(
+                                name: editedName,
+                                avatarData: nil
+                            )
+                            isEditing = false
+                        }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(themeManager.accentColor)
+                    .disabled(editedName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+            } else {
+                Button("Edit Profile") {
+                    editedName = viewModel.currentUser?.displayName ?? ""
+                    isEditing = true
+                }
+                .buttonStyle(.bordered)
+                .tint(themeManager.accentColor)
+            }
+        }
+    }
+    
+    private var appearanceSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Appearance")
+                .font(.headline)
+                .padding(.horizontal)
+            
+            VStack(spacing: 0) {
+                darkModeToggle
+                
+                Divider()
+                    .padding(.leading, 52)
+                
+                accentColorPicker
+            }
+            .background(Color.customCard)
+            .cornerRadius(12)
+        }
+        .padding(.horizontal)
+    }
+    
+    private var darkModeToggle: some View {
+        HStack {
+            Image(systemName: "moon.fill")
+                .font(.title3)
+                .foregroundColor(themeManager.accentColor)
+                .frame(width: 28)
+            
+            Text("Dark Mode")
+                .font(.body)
+            
+            Spacer()
+            
+            Toggle("", isOn: darkModeBinding)
+                .tint(themeManager.accentColor)
+        }
+        .padding()
+    }
+    
+    private var darkModeBinding: Binding<Bool> {
+        Binding(
+            get: {
+                if let scheme = colorScheme {
+                    return scheme == .dark
+                }
+                return UITraitCollection.current.userInterfaceStyle == .dark
+            },
+            set: { isDark in
+                colorScheme = isDark ? .dark : .light
+                themeManager.setColorScheme(colorScheme)
+            }
+        )
+    }
+    
+    private var accentColorPicker: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Image(systemName: "paintpalette")
+                    .font(.title3)
+                    .foregroundColor(themeManager.accentColor)
+                    .frame(width: 28)
+                
+                Text("Accent Color")
+                    .font(.body)
+            }
+            
+            HStack(spacing: 16) {
+                ForEach(AccentColorOption.allCases, id: \.self) { option in
+                    AccentColorSwatch(
+                        color: option,
+                        isSelected: accentColor == option
+                    ) {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            accentColor = option
+                            themeManager.setAccentColor(option)
+                        }
+                    }
+                }
+            }
+            .padding(.leading, 44)
+        }
+        .padding()
+    }
+    
+    private var typographySection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Typography")
+                .font(.headline)
+                .padding(.horizontal)
+            
+            VStack(spacing: 12) {
+                fontSizeHeader
+                fontSizeSlider
+                previewText
+            }
+            .padding(.vertical)
+            .background(Color.customCard)
+            .cornerRadius(12)
+        }
+        .padding(.horizontal)
+    }
+    
+    private var fontSizeHeader: some View {
+        HStack {
+            Image(systemName: "textformat.size")
+                .font(.title3)
+                .foregroundColor(themeManager.accentColor)
+                .frame(width: 28)
+            
+            Text("Font Size")
+                .font(.body)
+            
+            Spacer()
+            
+            Text(fontSize.displayName)
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+        }
+        .padding(.horizontal)
+    }
+    
+    private var fontSizeSlider: some View {
+        HStack(spacing: 12) {
+            Text("A")
+                .font(.caption)
+            
+            Slider(value: fontSizeBinding, in: 0...Double(FontSizeOption.allCases.count - 1), step: 1)
+                .tint(themeManager.accentColor)
+            
+            Text("A")
+                .font(.title2)
+        }
+        .padding(.horizontal)
+    }
+    
+    private var fontSizeBinding: Binding<Double> {
+        Binding(
+            get: {
+                Double(FontSizeOption.allCases.firstIndex(of: fontSize) ?? 1)
+            },
+            set: { newValue in
+                let index = Int(round(newValue))
+                if index < FontSizeOption.allCases.count {
+                    fontSize = FontSizeOption.allCases[index]
+                    themeManager.setFontSize(fontSize)
+                }
+            }
+        )
+    }
+    
+    private var previewText: some View {
+        Text("The only way to do great work is to love what you do.")
+            .font(.system(size: themeManager.quoteFontSize))
+            .foregroundColor(.secondary)
+            .padding(.horizontal)
+    }
+    
+    private var notificationsSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Notifications")
+                .font(.headline)
+                .padding(.horizontal)
+            
+            VStack(spacing: 0) {
+                notificationToggle
+                
+                if notificationsEnabled {
+                    Divider()
+                        .padding(.leading, 52)
+                    
+                    notificationTimePicker
+                }
+            }
+            .background(Color.customCard)
+            .cornerRadius(12)
+        }
+        .padding(.horizontal)
+    }
+    
+    private var notificationToggle: some View {
+        HStack {
+            Image(systemName: "bell.fill")
+                .font(.title3)
+                .foregroundColor(themeManager.accentColor)
+                .frame(width: 28)
+            
+            Text("Daily Quote")
+                .font(.body)
+            
+            Spacer()
+            
+            Toggle("", isOn: notificationBinding)
+                .tint(themeManager.accentColor)
+        }
+        .padding()
+    }
+    
+    private var notificationBinding: Binding<Bool> {
+        Binding(
+            get: { notificationsEnabled },
+            set: { newValue in
+                Task {
+                    await toggleNotifications(newValue)
+                }
+            }
+        )
+    }
+    
+    private var notificationTimePicker: some View {
+        HStack {
+            Image(systemName: "clock")
+                .font(.title3)
+                .foregroundColor(themeManager.accentColor)
+                .frame(width: 28)
+            
+            DatePicker("Time", selection: notificationTimeBinding, displayedComponents: .hourAndMinute)
+                .tint(themeManager.accentColor)
+        }
+        .padding()
+    }
+    
+    private var notificationTimeBinding: Binding<Date> {
+        Binding(
+            get: { notificationTime },
+            set: { newValue in
+                Task {
+                    await updateNotificationTime(newValue)
+                }
+            }
+        )
+    }
+    
+    private var logoutButton: some View {
+        Button(action: {
+            showLogoutAlert = true
+        }) {
+            HStack {
+                Image(systemName: "rectangle.portrait.and.arrow.right")
+                Text("Log Out")
+            }
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(Color.red.opacity(0.1))
+            .foregroundColor(.red)
+            .cornerRadius(12)
+        }
+        .padding(.horizontal)
+        .padding(.top, 8)
+    }
+    
+    private var errorBanner: some View {
+        Group {
+            if let error = viewModel.errorMessage {
+                VStack {
+                    Spacer()
+                    ErrorBanner(message: error) {
+                        viewModel.clearError()
+                    }
+                    .padding()
+                }
+            }
+        }
+    }
+    
+    // MARK: - Helper Methods
     
     private func formatDate(_ date: Date?) -> String {
         guard let date = date else { return "Unknown" }
@@ -547,12 +542,13 @@ struct ProfileMenuItem: View {
     let title: String
     let value: String
     var showChevron: Bool = true
+    var accentColor: Color = .blue
     
     var body: some View {
         HStack(spacing: 16) {
             Image(systemName: icon)
                 .font(.title3)
-                .foregroundColor(.blue)
+                .foregroundColor(accentColor)
                 .frame(width: 28)
             
             VStack(alignment: .leading, spacing: 2) {
@@ -575,8 +571,4 @@ struct ProfileMenuItem: View {
         }
         .padding()
     }
-}
-
-#Preview {
-    ProfileView()
 }

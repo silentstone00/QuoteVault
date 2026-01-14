@@ -16,7 +16,7 @@ struct CollectionDetailView: View {
     
     var body: some View {
         ZStack {
-            Color(.systemGroupedBackground)
+            Color.customBackground
                 .ignoresSafeArea()
             
             if viewModel.isLoading {
@@ -133,7 +133,7 @@ struct CollectionQuoteCard: View {
             .padding(.top, 4)
         }
         .padding()
-        .background(Color(.systemBackground))
+        .background(Color.customCard)
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.05), radius: 3, x: 0, y: 1)
     }
