@@ -6,14 +6,13 @@
 //
 
 import SwiftUI
-import PhotosUI
 
 struct ProfileView: View {
     @StateObject private var viewModel = AuthViewModel()
     @EnvironmentObject var themeManager: ThemeManager
     @State private var isEditing = false
     @State private var editedName = ""
-    @State private var selectedPhoto: PhotosPickerItem?
+    @State private var selectedProfileImage = "ladka"
     @State private var showLogoutAlert = false
     @State private var colorScheme: ColorScheme?
     @State private var accentColor: AccentColorOption = .blue
@@ -46,6 +45,7 @@ struct ProfileView: View {
                 accentColor = themeManager.theme.accentColor
                 fontSize = themeManager.theme.fontSize
                 await loadNotificationSettings()
+                loadProfileImage()
             }
             .alert("Log Out", isPresented: $showLogoutAlert) {
                 Button("Cancel", role: .cancel) { }
@@ -67,7 +67,7 @@ struct ProfileView: View {
             avatarView
             
             if isEditing {
-                photoPickerButton
+                profileImageSelector
             }
             
             if isEditing {
@@ -87,42 +87,36 @@ struct ProfileView: View {
     }
     
     private var avatarView: some View {
-        Group {
-            if let avatarUrl = viewModel.currentUser?.avatarUrl,
-               let url = URL(string: avatarUrl) {
-                AsyncImage(url: url) { image in
-                    image
-                        .resizable()
-                        .scaledToFill()
-                } placeholder: {
-                    Image(systemName: "person.circle.fill")
-                        .resizable()
-                        .foregroundColor(.gray)
-                }
-                .frame(width: 120, height: 120)
-                .clipShape(Circle())
-            } else {
-                Image(systemName: "person.circle.fill")
-                    .resizable()
-                    .foregroundColor(.gray)
-                    .frame(width: 120, height: 120)
-            }
-        }
+        Image(selectedProfileImage)
+            .resizable()
+            .scaledToFill()
+            .frame(width: 120, height: 120)
+            .clipShape(Circle())
     }
     
-    private var photoPickerButton: some View {
-        PhotosPicker(selection: $selectedPhoto, matching: .images) {
-            Text("Change Photo")
+    private var profileImageSelector: some View {
+        VStack(spacing: 12) {
+            Text("Choose Profile Picture")
                 .font(.subheadline)
-                .foregroundColor(themeManager.accentColor)
-        }
-        .onChange(of: selectedPhoto) { newValue in
-            Task {
-                if let data = try? await newValue?.loadTransferable(type: Data.self) {
-                    await viewModel.updateProfile(name: nil, avatarData: data)
+                .foregroundColor(.secondary)
+            
+            HStack(spacing: 20) {
+                ProfileImageOption(
+                    imageName: "ladka",
+                    isSelected: selectedProfileImage == "ladka"
+                ) {
+                    selectedProfileImage = "ladka"
+                }
+                
+                ProfileImageOption(
+                    imageName: "ladki",
+                    isSelected: selectedProfileImage == "ladki"
+                ) {
+                    selectedProfileImage = "ladki"
                 }
             }
         }
+        .padding(.horizontal)
     }
     
     private var nameEditField: some View {
@@ -169,6 +163,7 @@ struct ProfileView: View {
                     Button("Cancel") {
                         isEditing = false
                         editedName = viewModel.currentUser?.displayName ?? ""
+                        loadProfileImage()
                     }
                     .buttonStyle(.bordered)
                     
@@ -178,6 +173,7 @@ struct ProfileView: View {
                                 name: editedName,
                                 avatarData: nil
                             )
+                            saveProfileImage()
                             isEditing = false
                         }
                     }
@@ -468,6 +464,20 @@ struct ProfileView: View {
         return formatter.string(from: date)
     }
     
+    // MARK: - Profile Image Methods
+    
+    private func loadProfileImage() {
+        if let savedImage = UserDefaults.standard.string(forKey: "selectedProfileImage") {
+            selectedProfileImage = savedImage
+        } else {
+            selectedProfileImage = "ladka"
+        }
+    }
+    
+    private func saveProfileImage() {
+        UserDefaults.standard.set(selectedProfileImage, forKey: "selectedProfileImage")
+    }
+    
     // MARK: - Notification Methods
     
     private func loadNotificationSettings() async {
@@ -532,6 +542,43 @@ struct ProfileView: View {
         let defaults = UserDefaults.standard
         defaults.set(notificationsEnabled, forKey: "notificationsEnabled")
         defaults.set(notificationTime, forKey: "notificationTime")
+    }
+}
+
+// MARK: - Profile Image Option
+
+struct ProfileImageOption: View {
+    let imageName: String
+    let isSelected: Bool
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Image(imageName)
+                .resizable()
+                .scaledToFill()
+                .frame(width: 80, height: 80)
+                .clipShape(Circle())
+                .overlay(
+                    Circle()
+                        .stroke(isSelected ? Color.blue : Color.clear, lineWidth: 3)
+                )
+                .overlay(
+                    Group {
+                        if isSelected {
+                            Circle()
+                                .fill(Color.blue)
+                                .frame(width: 24, height: 24)
+                                .overlay(
+                                    Image(systemName: "checkmark")
+                                        .foregroundColor(.white)
+                                        .font(.system(size: 12, weight: .bold))
+                                )
+                                .offset(x: 28, y: -28)
+                        }
+                    }
+                )
+        }
     }
 }
 

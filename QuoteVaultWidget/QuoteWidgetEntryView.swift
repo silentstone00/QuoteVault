@@ -8,6 +8,9 @@
 import SwiftUI
 import WidgetKit
 
+// Dark background color from app (RGB: 0.039, 0.051, 0.071)
+private let widgetBackground = Color(red: 0.039, green: 0.051, blue: 0.071)
+
 /// Main view for the quote widget
 struct QuoteWidgetEntryView: View {
     @Environment(\.widgetFamily) var widgetFamily
@@ -15,7 +18,6 @@ struct QuoteWidgetEntryView: View {
     
     var body: some View {
         if let quote = entry.quote {
-            // Display quote
             switch widgetFamily {
             case .systemSmall:
                 SmallWidgetView(quote: quote)
@@ -25,7 +27,6 @@ struct QuoteWidgetEntryView: View {
                 MediumWidgetView(quote: quote)
             }
         } else {
-            // No quote available
             EmptyWidgetView()
         }
     }
@@ -37,36 +38,40 @@ struct SmallWidgetView: View {
     let quote: Quote
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            // Quote icon
-            Image(systemName: "quote.bubble.fill")
-                .font(.system(size: 16))
-                .foregroundColor(categoryColor)
+        VStack(alignment: .leading, spacing: 0) {
+            // Large opening quote mark
+            Text("\u{201C}")
+                .font(.system(size: 48, weight: .bold, design: .serif))
+                .foregroundColor(categoryColor.opacity(0.5))
+                .frame(height: 32)
+                .offset(x: -4, y: 0)
             
-            Spacer()
+            Spacer(minLength: 4)
             
-            // Quote text with quotation marks
-            Text("\"\(quote.text)\"")
-                .font(.system(size: 13, weight: .medium))
-                .lineLimit(5)
-                .foregroundColor(.primary)
-                .minimumScaleFactor(0.9)
+            // Quote text
+            Text(quote.text)
+                .font(.system(size: 13, weight: .medium, design: .rounded))
+                .lineLimit(4)
+                .foregroundColor(.white)
+                .minimumScaleFactor(0.85)
             
-            Spacer()
+            Spacer(minLength: 8)
             
-            // Author
-            Text("— \(quote.author)")
-                .font(.system(size: 10, weight: .regular))
-                .foregroundColor(.secondary)
-                .lineLimit(1)
+            // Author with accent line
+            HStack(spacing: 6) {
+                RoundedRectangle(cornerRadius: 1)
+                    .fill(categoryColor)
+                    .frame(width: 16, height: 2)
+                
+                Text(quote.author)
+                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .foregroundColor(.white.opacity(0.7))
+                    .lineLimit(1)
+            }
         }
-        .padding(10)
+        .padding(14)
         .containerBackground(for: .widget) {
-            LinearGradient(
-                colors: [categoryColor.opacity(0.3), categoryColor.opacity(0.1)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
+            widgetBackground
         }
     }
     
@@ -87,60 +92,71 @@ struct MediumWidgetView: View {
     let quote: Quote
     
     var body: some View {
-        HStack(spacing: 12) {
-            // Left side - Icon
-            VStack {
-                Image(systemName: "quote.bubble.fill")
-                    .font(.system(size: 36))
-                    .foregroundColor(categoryColor)
-                
-                Spacer()
-                
-                // Category badge
-                Text(quote.category.rawValue.capitalized)
-                    .font(.system(size: 9, weight: .semibold))
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 3)
-                    .background(categoryColor)
-                    .cornerRadius(6)
-                    .fixedSize()
-                    .lineLimit(1)
-            }
-            .frame(width: 50)
+        HStack(spacing: 0) {
+            // Left accent bar
+            RoundedRectangle(cornerRadius: 2)
+                .fill(categoryColor)
+                .frame(width: 4)
+                .padding(.vertical, 16)
             
-            // Right side - Quote content
-            VStack(alignment: .leading, spacing: 6) {
-                // Title
-                Text("Quote of the Day")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(.secondary)
+            // Content
+            VStack(alignment: .leading, spacing: 8) {
+                // Header row
+                HStack {
+                    // Large quote mark
+                    Text("\u{201C}")
+                        .font(.system(size: 44, weight: .bold, design: .serif))
+                        .foregroundColor(categoryColor.opacity(0.4))
+                        .frame(width: 30, height: 30)
+                        .offset(y: 4)
+                    
+                    Spacer()
+                    
+                    // Category pill
+                    Text(quote.category.rawValue.uppercased())
+                        .font(.system(size: 10, weight: .bold, design: .rounded))
+                        .tracking(0.5)
+                        .foregroundColor(categoryColor)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(
+                            Capsule()
+                                .fill(categoryColor.opacity(0.2))
+                        )
+                }
                 
-                Spacer()
-                
-                // Quote text with quotation marks
-                Text("\"\(quote.text)\"")
-                    .font(.system(size: 15, weight: .medium))
+                // Quote text - increased font and more lines
+                Text(quote.text)
+                    .font(.system(size: 17, weight: .medium, design: .rounded))
                     .lineLimit(4)
-                    .foregroundColor(.primary)
-                    .minimumScaleFactor(0.9)
+                    .foregroundColor(.white)
+                    .minimumScaleFactor(0.85)
                 
-                Spacer()
+                Spacer(minLength: 4)
                 
                 // Author
-                Text("— \(quote.author)")
-                    .font(.system(size: 12, weight: .regular))
-                    .foregroundColor(.secondary)
-                    .lineLimit(1)
+                HStack(spacing: 8) {
+                    Circle()
+                        .fill(categoryColor.opacity(0.25))
+                        .frame(width: 26, height: 26)
+                        .overlay(
+                            Text(String(quote.author.prefix(1)))
+                                .font(.system(size: 12, weight: .bold, design: .rounded))
+                                .foregroundColor(categoryColor)
+                        )
+                    
+                    Text(quote.author)
+                        .font(.system(size: 13, weight: .semibold, design: .rounded))
+                        .foregroundColor(.white.opacity(0.7))
+                        .lineLimit(1)
+                }
             }
+            .padding(.leading, 14)
+            .padding(.trailing, 16)
+            .padding(.vertical, 12)
         }
-        .padding(12)
         .containerBackground(for: .widget) {
-            LinearGradient(
-                colors: [categoryColor.opacity(0.3), categoryColor.opacity(0.1)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
+            widgetBackground
         }
     }
     
@@ -159,27 +175,31 @@ struct MediumWidgetView: View {
 
 struct EmptyWidgetView: View {
     var body: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "quote.bubble")
-                .font(.system(size: 40))
-                .foregroundColor(.blue)
+        VStack(spacing: 10) {
+            // Quote icon
+            ZStack {
+                Circle()
+                    .fill(Color.blue.opacity(0.2))
+                    .frame(width: 52, height: 52)
+                
+                Image(systemName: "quote.bubble")
+                    .font(.system(size: 24, weight: .medium))
+                    .foregroundColor(.blue)
+            }
             
-            Text("Open QuoteVault")
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundColor(.primary)
-            
-            Text("to see your daily quote")
-                .font(.system(size: 11))
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
+            VStack(spacing: 4) {
+                Text("No Quote Yet")
+                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .foregroundColor(.white)
+                
+                Text("Open app to get started")
+                    .font(.system(size: 11, weight: .regular, design: .rounded))
+                    .foregroundColor(.white.opacity(0.7))
+            }
         }
-        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .containerBackground(for: .widget) {
-            LinearGradient(
-                colors: [Color.blue.opacity(0.3), Color.blue.opacity(0.1)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
+            widgetBackground
         }
     }
 }
@@ -189,17 +209,14 @@ struct EmptyWidgetView: View {
 struct QuoteWidgetEntryView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            // Small widget preview
             QuoteWidgetEntryView(entry: .placeholder)
                 .previewContext(WidgetPreviewContext(family: .systemSmall))
                 .previewDisplayName("Small")
             
-            // Medium widget preview
             QuoteWidgetEntryView(entry: .placeholder)
                 .previewContext(WidgetPreviewContext(family: .systemMedium))
                 .previewDisplayName("Medium")
             
-            // Empty state preview
             QuoteWidgetEntryView(entry: .empty)
                 .previewContext(WidgetPreviewContext(family: .systemMedium))
                 .previewDisplayName("Empty")
