@@ -19,7 +19,21 @@ A beautiful iOS app for discovering, saving, and sharing inspirational quotes. B
 
 ## Screenshots
 
-*Add your app screenshots here*
+<!-- Row 1: 4 images -->
+<p align="center">
+  <img src="screenshots/1.jpeg" width="22%" />
+  <img src="screenshots/2.jpeg" width="22%" />
+  <img src="screenshots/3.jpeg" width="22%" />
+  <img src="screenshots/4.jpeg" width="22%" />
+</p>
+
+<!-- Row 2: 3 images -->
+<p align="center">
+  <img src="screenshots/5.jpeg" width="30%" />
+  <img src="screenshots/6.jpeg" width="30%" />
+  <img src="screenshots/7.jpeg" width="30%" />
+</p>
+
 
 ---
 
