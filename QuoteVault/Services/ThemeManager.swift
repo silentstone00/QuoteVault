@@ -75,7 +75,7 @@ struct AppTheme: Codable {
     var fontSize: FontSizeOption
     
     static let `default` = AppTheme(
-        colorScheme: nil,
+        colorScheme: "light",
         accentColor: .blue,
         fontSize: .medium
     )

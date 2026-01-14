@@ -13,6 +13,8 @@ import SwiftUI
 @MainActor
 class AuthViewModel: ObservableObject {
     // MARK: - Published Properties
+    @Published var isPasswordVisible = false
+    @Published var isConfirmPasswordVisible = false
     
     @Published var isAuthenticated = false
     @Published var currentUser: User?
